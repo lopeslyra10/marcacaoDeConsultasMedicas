@@ -2,6 +2,7 @@
  * Tipos relacionados a consultas médicas
  * Este arquivo contém todas as definições de tipos necessárias para o gerenciamento de consultas
  */
+
 /**
  * Representa uma consulta médica no sistema
  * @property id - Identificador único da consulta
@@ -18,4 +19,4 @@ export type Appointment = {
   time: string;
   description: string;
   status: string;
-};
+}; 
