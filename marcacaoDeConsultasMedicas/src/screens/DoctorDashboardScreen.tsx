@@ -18,6 +18,7 @@ type DoctorDashboardScreenProps = {
 interface Appointment {
   id: string;
   patientId: string;
+  patientName: string;
   doctorId: string;
   doctorName: string;
   date: string;
@@ -121,48 +122,60 @@ const DoctorDashboardScreen: React.FC = () => {
         ) : (
           appointments.map((appointment) => (
             <AppointmentCard key={appointment.id}>
-              <ListItem.Content>
-                <ListItem.Title style={styles.dateTime as TextStyle}>
-                  {appointment.date} às {appointment.time}
-                </ListItem.Title>
-                <StatusBadge status={appointment.status}>
-                  <StatusText status={appointment.status}>
-                    {getStatusText(appointment.status)}
-                  </StatusText>
-                </StatusBadge>
-                {appointment.status === 'pending' && (
-                  <ButtonContainer>
-                    <Button
-                      title="Confirmar"
-                      onPress={() => handleUpdateStatus(appointment.id, 'confirmed')}
-                      containerStyle={styles.actionButton as ViewStyle}
-                      buttonStyle={styles.confirmButton}
-                    />
-                    <Button
-                      title="Cancelar"
-                      onPress={() => handleUpdateStatus(appointment.id, 'cancelled')}
-                      containerStyle={styles.actionButton as ViewStyle}
-                      buttonStyle={styles.cancelButton}
-                    />
-                  </ButtonContainer>
-                )}
-              </ListItem.Content>
+              <ListItem.Subtitle style={styles.dateTime as TextStyle}>
+                {appointment.date} às {appointment.time}
+              </ListItem.Subtitle>
+              <Text style={styles.specialty as TextStyle}>
+                {appointment.specialty}
+              </Text>
+              <StatusBadge status={appointment.status}>
+                <StatusText status={appointment.status}>
+                  {getStatusText(appointment.status)}
+                </StatusText>
+              </StatusBadge>
+              {appointment.status === 'pending' && (
+                <ButtonContainer>
+                  <Button
+                    title="Confirmar"
+                    onPress={() => handleUpdateStatus(appointment.id, 'confirmed')}
+                    containerStyle={styles.actionButton as ViewStyle}
+                    buttonStyle={styles.confirmButton}
+                  />
+                  <Button
+                    title="Cancelar"
+                    onPress={() => handleUpdateStatus(appointment.id, 'cancelled')}
+                    containerStyle={styles.actionButton as ViewStyle}
+                    buttonStyle={styles.cancelButton}
+                  />
+                </ButtonContainer>
+              )}
+            </ListItem.Content>
             </AppointmentCard>
-          ))
+      ))
         )}
 
-        <Button
-          title="Sair"
-          onPress={signOut}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.logoutButton}
-        />
-      </ScrollView>
-    </Container>
+      <Button
+        title="Sair"
+        onPress={signOut}
+        containerStyle={styles.button as ViewStyle}
+        buttonStyle={styles.logoutButton}
+      />
+    </ScrollView>
+    </Container >
   );
 };
 
 const styles = {
+  patientName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  specialty: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: theme.colors.text,
+  },
   scrollContent: {
     padding: 20,
   },
