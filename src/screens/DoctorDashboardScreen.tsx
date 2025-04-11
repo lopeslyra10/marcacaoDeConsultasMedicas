@@ -11,8 +11,8 @@ import theme from '../styles/theme';
 import Header from '../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type PatientDashboardScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'PatientDashboard'>;
+type DoctorDashboardScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'DoctorDashboard'>;
 };
 
 interface Appointment {
@@ -53,9 +53,9 @@ const getStatusText = (status: string) => {
   }
 };
 
-const PatientDashboardScreen: React.FC = () => {
+const DoctorDashboardScreen: React.FC = () => {
   const { user, signOut } = useAuth();
-  const navigation = useNavigation<PatientDashboardScreenProps['navigation']>();
+  const navigation = useNavigation<DoctorDashboardScreenProps['navigation']>();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,10 +64,10 @@ const PatientDashboardScreen: React.FC = () => {
       const storedAppointments = await AsyncStorage.getItem('@MedicalApp:appointments');
       if (storedAppointments) {
         const allAppointments: Appointment[] = JSON.parse(storedAppointments);
-        const userAppointments = allAppointments.filter(
-          (appointment) => appointment.patientId === user?.id
+        const doctorAppointments = allAppointments.filter(
+          (appointment) => appointment.doctorId === user?.id
         );
-        setAppointments(userAppointments);
+        setAppointments(doctorAppointments);
       }
     } catch (error) {
       console.error('Erro ao carregar consultas:', error);
@@ -76,7 +76,25 @@ const PatientDashboardScreen: React.FC = () => {
     }
   };
 
-  // Carrega as consultas quando a tela estiver em foco
+  const handleUpdateStatus = async (appointmentId: string, newStatus: 'confirmed' | 'cancelled') => {
+    try {
+      const storedAppointments = await AsyncStorage.getItem('@MedicalApp:appointments');
+      if (storedAppointments) {
+        const allAppointments: Appointment[] = JSON.parse(storedAppointments);
+        const updatedAppointments = allAppointments.map(appointment => {
+          if (appointment.id === appointmentId) {
+            return { ...appointment, status: newStatus };
+          }
+          return appointment;
+        });
+        await AsyncStorage.setItem('@MedicalApp:appointments', JSON.stringify(updatedAppointments));
+        loadAppointments();
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       loadAppointments();
@@ -88,13 +106,6 @@ const PatientDashboardScreen: React.FC = () => {
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Title>Minhas Consultas</Title>
-
-        <Button
-          title="Agendar Nova Consulta"
-          onPress={() => navigation.navigate('CreateAppointment')}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
 
         <Button
           title="Meu Perfil"
@@ -110,48 +121,54 @@ const PatientDashboardScreen: React.FC = () => {
         ) : (
           appointments.map((appointment) => (
             <AppointmentCard key={appointment.id}>
-              <ListItem.Subtitle style={styles.dateTime as TextStyle}>
-                {appointment.date} às {appointment.time}
-              </ListItem.Subtitle>
-              <Text style={styles.doctorName as TextStyle}>
-                {appointment.doctorName}
-              </Text>
-              <Text style={styles.specialty as TextStyle}>
-                {appointment.specialty}
-              </Text>
-              <ListItem.Subtitle style={styles.specialty as TextStyle}>
-                {appointment.specialty}
-              </ListItem.Subtitle>
-              <Text style={styles.dateTime as TextStyle}>
-                {appointment.date} às {appointment.time}
-              </Text>
-              <StatusBadge status={appointment.status}>
-                <StatusText status={appointment.status}>
-                  {getStatusText(appointment.status)}
-                </StatusText>
-              </StatusBadge>
-            </ListItem.Content>
+              <ListItem.Content>
+                <ListItem.Title style={styles.patientName as TextStyle}>
+                  Paciente: {appointment.patientName || 'Nome não disponível'}
+                </ListItem.Title>
+                <ListItem.Subtitle style={styles.dateTime as TextStyle}>
+                  {appointment.date} às {appointment.time}
+                </ListItem.Subtitle>
+                <Text style={styles.specialty as TextStyle}>
+                  {appointment.specialty}
+                </Text>
+                <StatusBadge status={appointment.status}>
+                  <StatusText status={appointment.status}>
+                    {getStatusText(appointment.status)}
+                  </StatusText>
+                </StatusBadge>
+                {appointment.status === 'pending' && (
+                  <ButtonContainer>
+                    <Button
+                      title="Confirmar"
+                      onPress={() => handleUpdateStatus(appointment.id, 'confirmed')}
+                      containerStyle={styles.actionButton as ViewStyle}
+                      buttonStyle={styles.confirmButton}
+                    />
+                    <Button
+                      title="Cancelar"
+                      onPress={() => handleUpdateStatus(appointment.id, 'cancelled')}
+                      containerStyle={styles.actionButton as ViewStyle}
+                      buttonStyle={styles.cancelButton}
+                    />
+                  </ButtonContainer>
+                )}
+              </ListItem.Content>
             </AppointmentCard>
-      ))
+          ))
         )}
 
-      <Button
-        title="Sair"
-        onPress={signOut}
-        containerStyle={styles.button as ViewStyle}
-        buttonStyle={styles.logoutButton}
-      />
-    </ScrollView>
-    </Container >
+        <Button
+          title="Sair"
+          onPress={signOut}
+          containerStyle={styles.button as ViewStyle}
+          buttonStyle={styles.logoutButton}
+        />
+      </ScrollView>
+    </Container>
   );
 };
 
 const styles = {
-  patientName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
   scrollContent: {
     padding: 20,
   },
@@ -167,20 +184,32 @@ const styles = {
     backgroundColor: theme.colors.error,
     paddingVertical: 12,
   },
-  doctorName: {
-    fontSize: 18,
+  actionButton: {
+    marginTop: 8,
+    width: '48%',
+  },
+  confirmButton: {
+    backgroundColor: theme.colors.success,
+    paddingVertical: 8,
+  },
+  cancelButton: {
+    backgroundColor: theme.colors.error,
+    paddingVertical: 8,
+  },
+  dateTime: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  patientName: {
+    fontSize: 16,
     fontWeight: '700',
     color: theme.colors.text,
   },
   specialty: {
     fontSize: 14,
+    fontWeight: '500',
     color: theme.colors.text,
-    marginTop: 4,
-  },
-  dateTime: {
-    fontSize: 14,
-    color: theme.colors.text,
-    marginTop: 4,
   },
 };
 
@@ -234,4 +263,10 @@ const StatusText = styled.Text<StyledProps>`
   font-weight: 500;
 `;
 
-export default PatientDashboardScreen; 
+const ButtonContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 8px;
+`;
+
+export default DoctorDashboardScreen;

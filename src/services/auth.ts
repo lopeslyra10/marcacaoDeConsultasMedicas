@@ -46,7 +46,7 @@ const mockAdmin = {
 };
 
 // Lista de usuários cadastrados (pacientes)
-let registeredUsers: (User & { password: string })[] = [];
+let registeredUsers: User[] = [];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -74,12 +74,10 @@ export const authService = {
       (p) => p.email === credentials.email
     );
     if (patient) {
-      // Verifica a senha do paciente
-      if (credentials.password === patient.password) {
-        // Remove a senha do objeto antes de retornar
-        const { password, ...patientWithoutPassword } = patient;
+      // Para pacientes, a senha padrão é 123456
+      if (credentials.password === '123456') {
         return {
-          user: patientWithoutPassword,
+          user: patient,
           token: `patient-token-${patient.id}`,
         };
       }
@@ -99,7 +97,7 @@ export const authService = {
     }
 
     // Cria um novo paciente
-    const newPatient: User & { password: string } = {
+    const newPatient: User = {
       id: `patient-${registeredUsers.length + 1}`,
       name: data.name,
       email: data.email,
@@ -107,7 +105,6 @@ export const authService = {
       image: `https://randomuser.me/api/portraits/${registeredUsers.length % 2 === 0 ? 'men' : 'women'}/${
         registeredUsers.length + 1
       }.jpg`,
-      password: data.password,
     };
 
     registeredUsers.push(newPatient);
@@ -115,10 +112,8 @@ export const authService = {
     // Salva a lista atualizada de usuários
     await AsyncStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(registeredUsers));
 
-    // Remove a senha do objeto antes de retornar
-    const { password, ...patientWithoutPassword } = newPatient;
     return {
-      user: patientWithoutPassword,
+      user: newPatient,
       token: `patient-token-${newPatient.id}`,
     };
   },

@@ -8,39 +8,25 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 
-type RegisterScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
+type LoginScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
 };
 
-const RegisterScreen: React.FC = () => {
-  const { register } = useAuth();
-  const navigation = useNavigation<RegisterScreenProps['navigation']>();
-  const [name, setName] = useState('');
+const LoginScreen: React.FC = () => {
+  const { signIn } = useAuth();
+  const navigation = useNavigation<LoginScreenProps['navigation']>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleRegister = async () => {
+  const handleLogin = async () => {
     try {
       setLoading(true);
       setError('');
-
-      if (!name || !email || !password) {
-        setError('Por favor, preencha todos os campos');
-        return;
-      }
-
-      await register({
-        name,
-        email,
-        password,
-      });
-
-      // Após o registro bem-sucedido, navega para o login
-      navigation.navigate('Login');
+      await signIn({ email, password });
     } catch (err) {
-      setError('Erro ao criar conta. Tente novamente.');
+      setError('Email ou senha inválidos');
     } finally {
       setLoading(false);
     }
@@ -48,16 +34,8 @@ const RegisterScreen: React.FC = () => {
 
   return (
     <Container>
-      <Title>Cadastro de Paciente</Title>
+      <Title>Login</Title>
       
-      <Input
-        placeholder="Nome completo"
-        value={name}
-        onChangeText={setName}
-        autoCapitalize="words"
-        containerStyle={styles.input}
-      />
-
       <Input
         placeholder="Email"
         value={email}
@@ -78,19 +56,27 @@ const RegisterScreen: React.FC = () => {
       {error ? <ErrorText>{error}</ErrorText> : null}
 
       <Button
-        title="Cadastrar"
-        onPress={handleRegister}
+        title="Entrar"
+        onPress={handleLogin}
         loading={loading}
         containerStyle={styles.button as ViewStyle}
         buttonStyle={styles.buttonStyle}
       />
 
       <Button
-        title="Voltar para Login"
-        onPress={() => navigation.navigate('Login')}
-        containerStyle={styles.backButton as ViewStyle}
-        buttonStyle={styles.backButtonStyle}
+        title="Cadastrar Novo Paciente"
+        onPress={() => navigation.navigate('Register')}
+        containerStyle={styles.registerButton as ViewStyle}
+        buttonStyle={styles.registerButtonStyle}
       />
+
+      <Text style={styles.hint}>
+        Use as credenciais de exemplo:
+      </Text>
+      <Text style={styles.credentials}>
+        Admin: admin@example.com / 123456{'\n'}
+        Médicos: joao@example.com, maria@example.com, pedro@example.com / 123456
+      </Text>
     </Container>
   );
 };
@@ -107,13 +93,24 @@ const styles = {
     backgroundColor: theme.colors.primary,
     paddingVertical: 12,
   },
-  backButton: {
+  registerButton: {
     marginTop: 10,
     width: '100%',
   },
-  backButtonStyle: {
+  registerButtonStyle: {
     backgroundColor: theme.colors.secondary,
     paddingVertical: 12,
+  },
+  hint: {
+    marginTop: 20,
+    textAlign: 'center' as const,
+    color: theme.colors.text,
+  },
+  credentials: {
+    marginTop: 10,
+    textAlign: 'center' as const,
+    color: theme.colors.text,
+    fontSize: 12,
   },
 };
 
@@ -138,4 +135,4 @@ const ErrorText = styled.Text`
   margin-bottom: 10px;
 `;
 
-export default RegisterScreen;  
+export default LoginScreen;
