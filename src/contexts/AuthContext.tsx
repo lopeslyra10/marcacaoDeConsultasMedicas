@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
     } catch (error) {
       throw error;
-    }
+    } 
   };
 
   const signOut = async () => {
@@ -71,6 +71,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
+    }
+  };
+
+  const updateUser = async (updatedUser: User) => {
+    try {
+      setUser(updatedUser);
+      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
+      throw error;
     }
   };
 
