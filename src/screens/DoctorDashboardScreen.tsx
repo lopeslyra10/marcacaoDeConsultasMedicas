@@ -10,6 +10,7 @@ import { RootStackParamList } from '../types/navigation';
 import theme from '../styles/theme';
 import Header from '../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import StatisticsCard from '../components/StatisticsCard';
 
 type DoctorDashboardScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'DoctorDashboard'>;
@@ -58,8 +59,10 @@ const DoctorDashboardScreen: React.FC = () => {
   const navigation = useNavigation<DoctorDashboardScreenProps['navigation']>();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statistics, setStatistics] = useState<DoctorStatistics | null>(null);
 
-  const loadAppointments = async () => {
+  const loadData = async () => {
+    if (!user) return;
     try {
       const storedAppointments = await AsyncStorage.getItem('@MedicalApp:appointments');
       if (storedAppointments) {
@@ -69,8 +72,11 @@ const DoctorDashboardScreen: React.FC = () => {
         );
         setAppointments(doctorAppointments);
       }
+      // Carrega estatísticas do médico
+      const stats = await statisticsService.getDoctorStatistics(user.id);
+      setStatistics(stats);
     } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
+      console.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
     }
@@ -88,7 +94,7 @@ const DoctorDashboardScreen: React.FC = () => {
           return appointment;
         });
         await AsyncStorage.setItem('@MedicalApp:appointments', JSON.stringify(updatedAppointments));
-        loadAppointments();
+        loadData();
       }
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
@@ -97,7 +103,7 @@ const DoctorDashboardScreen: React.FC = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      loadAppointments();
+      loadData();
     }, [])
   );
 
@@ -113,6 +119,38 @@ const DoctorDashboardScreen: React.FC = () => {
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.buttonStyle}
         />
+
+        <SectionTitle>Minhas Estatísticas</SectionTitle>
+        {statistics && (
+          <StatisticsGrid>
+            <StatisticsCard
+              title="Total de Consultas"
+              value={statistics.totalAppointments}
+              color={theme.colors.primary}
+              subtitle="Total de agendamentos"
+            />
+            <StatisticsCard
+              title="Consultas Confirmadas"
+              value={statistics.confirmedAppointments}
+              color={theme.colors.success}
+              subtitle={`${statistics.statusPercentages.confirmed.toFixed(1)}% do total`}
+            />
+            <StatisticsCard
+              title="Consultas Canceladas"
+              value={statistics.cancelledAppointments}
+              color={theme.colors.error}
+              subtitle={`${statistics.statusPercentages.cancelled.toFixed(1)}% do total`}
+            />
+            <StatisticsCard
+              title="Pacientes Atendidos"
+              value={statistics.totalPatients}
+              color={theme.colors.secondary}
+              subtitle="Pacientes únicos"
+            />
+          </StatisticsGrid>
+        )}
+
+        <SectionTitle>Próximas Consultas</SectionTitle>
 
         {loading ? (
           <LoadingText>Carregando consultas...</LoadingText>
@@ -267,6 +305,13 @@ const ButtonContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin-top: 8px;
+`;
+
+const StatisticsGrid = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
 `;
 
 export default DoctorDashboardScreen;
