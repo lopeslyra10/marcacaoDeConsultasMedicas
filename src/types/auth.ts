@@ -78,5 +78,6 @@ export interface AuthContextData {
   loading: boolean;
   signIn: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
-  signOut: () => Promise<void>;@rneui
-} 
+  signOut: () => Promise<void>;
+  updateUser: (user: User) => Promise<void>;
+}
