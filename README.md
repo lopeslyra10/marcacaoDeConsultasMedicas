@@ -1,36 +1,69 @@
 # Sistema de Agendamento de Consultas
 
 **Nome:** Augusto Lopes Lyra  
-**RM:** 558209
+**RM:** 558209  
 
-## Descrição do Projeto
+## 🩺 Clínica App  
 
-# 🩺 Clínica App
+Aplicativo mobile para marcação e gestão de consultas médicas com perfis de **administrador**, **médico** e **paciente**, desenvolvido em **React Native (Expo)** e **TypeScript**, como projeto acadêmico.  
 
-Aplicativo mobile desenvolvido com **React Native**, **Expo** e **TypeScript**, com foco em uma clínica médica que atende diferentes tipos de usuários: **administrador**, **médico** e **paciente**. O app permite login, exibição de perfis personalizados e visualização de agendamentos conforme o tipo de usuário.
+---
 
-## 🚀 Funcionalidades Implementadas
+## 👥 Perfis de usuário  
 
-### 🔐 Autenticação
-- Tela de login simulada com persistência usando `AsyncStorage`.
-- Contexto de autenticação (`AuthContext`) para manter estado global do usuário logado.
-- Tipagem com `UserType` para diferenciar usuários: `admin`, `doctor` e `patient`.
+- **Admin:** visão geral do sistema e lista de todos os agendamentos.  
+- **Médico:** agenda própria, exibição de consultas relacionadas ao seu perfil (com especialidade e CRM).  
+- **Paciente:** agenda suas consultas, visualiza apenas seus próprios agendamentos e acessa um histórico breve.  
 
-### 👤 Tela de Perfil
-- Exibe informações personalizadas de acordo com o tipo de usuário logado.
-- Exemplo:
-  - **Admin**: nome, tipo de usuário.
-  - **Médico**: nome, especialidade, CRM.
-  - **Paciente**: nome, idade, histórico breve.
+---
 
-### 🗓️ Tela de Agendamentos
-- Mostra os agendamentos de forma dinâmica, com base no tipo do usuário:
-  - **Admin** vê todos os agendamentos.
-  - **Médico** vê agendamentos onde ele é o médico.
-  - **Paciente** vê apenas os seus próprios agendamentos.
-- Componentização com `AgendamentoCard` para exibir cada agendamento.
+## 🚀 Funcionalidades Implementadas  
 
-### 📱 Navegação
-- Utiliza `React Navigation` com navegação por stack.
-- Redirecionamento inteligente com base no tipo do usuário após login.
+### 🔐 Autenticação  
+- Tela de login simulada com persistência via **AsyncStorage**.  
+- Contexto global de autenticação com **AuthContext**.  
+- Diferenciação de acesso por tipo de usuário (**admin**, **doctor**, **patient**) com `UserType`.  
+
+### 👤 Perfil  
+- Exibe dados personalizados conforme o tipo de usuário logado:  
+  - **Admin:** nome e tipo de usuário.  
+  - **Médico:** nome, especialidade e CRM.  
+  - **Paciente:** nome, idade e breve histórico.  
+
+### 🗓️ Agendamentos  
+- Visualização dinâmica de agendamentos baseada no perfil:  
+  - **Admin:** acessa todos os agendamentos.  
+  - **Médico:** acessa apenas os agendamentos em que é responsável.  
+  - **Paciente:** acessa somente seus próprios agendamentos.  
+- Uso do componente **AgendamentoCard** para exibir consultas de forma organizada.  
+
+### 📱 Navegação  
+- Implementada com **React Navigation** (Stack Navigation).  
+- Redirecionamento automático para telas específicas conforme o perfil do usuário.  
+
+---
+
+## 🛠️ Arquitetura e Tecnologias  
+
+- **Stack:** React Native (Expo), TypeScript.  
+- **Navegação:** @react-navigation/native (stack navigation).  
+- **Persistência:** AsyncStorage para simulação de login e dados locais.  
+- **Context API:** gerenciamento de sessão e perfis de usuário.  
+
+---
+
+## ▶️ Como executar  
+
+1. Instale as dependências:  
+   ```bash
+   npm install
+2. Inicie o App:
+```bash
+npm run start
+```
+3. Inicie o App:
+```bash
+npm run android
+npm run web
+```
 
