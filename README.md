@@ -1,7 +1,11 @@
 # Sistema de Agendamento de Consultas
 
-**Nome:** Augusto Lopes Lyra  
-**RM:** 558209  
+**Nomes:** 
+Augusto Lopes Lyra  
+Vinícius Ribeiro Nery
+**RM:** 
+558209  
+559165
 
 ## 🩺 Clínica App  
 
