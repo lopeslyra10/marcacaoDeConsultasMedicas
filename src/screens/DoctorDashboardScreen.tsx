@@ -174,7 +174,7 @@ const DoctorDashboardScreen: React.FC = () => {
                     {getStatusText(appointment.status)}
                   </StatusText>
                 </StatusBadge>
-                 {appointment.status === 'pending' && (
+                  {appointment.status === 'pending' && (
                   <ButtonContainer>
                     <Button
                       title="Confirmar"
@@ -201,6 +201,21 @@ const DoctorDashboardScreen: React.FC = () => {
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.logoutButton}
         />
+        {selectedAppointment && (
+          <AppointmentActionModal
+            visible={modalVisible}
+            onClose={handleCloseModal}
+            onConfirm={handleConfirmAction}
+            actionType={actionType}
+            appointmentDetails={{
+              patientName: selectedAppointment.patientName,
+              doctorName: selectedAppointment.doctorName,
+              date: selectedAppointment.date,
+              time: selectedAppointment.time,
+              specialty: selectedAppointment.specialty,
+            }}
+          />
+        )}
       </ScrollView>
     </Container>
   );
