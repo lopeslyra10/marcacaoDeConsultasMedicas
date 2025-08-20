@@ -144,14 +144,18 @@ const DoctorDashboardScreen: React.FC = () => {
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Title>Minhas Consultas</Title>
-
         <Button
           title="Meu Perfil"
           onPress={() => navigation.navigate('Profile')}
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.buttonStyle}
         />
-
+        <Button
+          title="Configurações"
+          onPress={() => navigation.navigate('Settings')}
+          containerStyle={styles.button as ViewStyle}
+          buttonStyle={styles.settingsButton}
+        />
         {loading ? (
           <LoadingText>Carregando consultas...</LoadingText>
         ) : appointments.length === 0 ? (
@@ -231,6 +235,10 @@ const styles = {
   },
   buttonStyle: {
     backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
+  },
+  settingsButton: {
+    backgroundColor: theme.colors.secondary,
     paddingVertical: 12,
   },
   logoutButton: {
@@ -321,5 +329,6 @@ const ButtonContainer = styled.View`
   justify-content: space-between;
   margin-top: 8px;
 `;
+
 
 export default DoctorDashboardScreen;
