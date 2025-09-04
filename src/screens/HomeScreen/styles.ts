@@ -7,6 +7,19 @@ export const Container = styled.View`
   background-color: ${theme.colors.background};
 `;
 
+export const HeaderContainer = styled.View`
+  background-color: ${theme.colors.primary};
+  padding: 16px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const HeaderTitle = styled.Text`
+  font-size: 20px;
+  font-weight: bold;
+  color: ${theme.colors.white};
+`;
+
 export const Content = styled.View`
   flex: 1;
   padding: ${theme.spacing.medium}px;
