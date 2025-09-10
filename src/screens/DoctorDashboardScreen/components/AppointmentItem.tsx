@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
 import { Appointment } from '../../../types/appointments';
+import { Appointment as BaseAppointment } from '../../../types/appointments';
 import { getPatientInfo } from '../models/patients';
 import theme from '../../../styles/theme';
 import {
@@ -15,11 +16,16 @@ import {
   ActionButton,
 } from '../styles';
 
+interface AppointmentWithPatient extends BaseAppointment {
+  patientId: string;
+}
+
 interface AppointmentItemProps {
-  appointment: Appointment;
-  onEdit?: (appointment: Appointment) => void;
+  appointment: AppointmentWithPatient;
+  onEdit?: (appointment: AppointmentWithPatient) => void;
   onDelete?: (appointmentId: string) => void;
 }
+
 
 export const AppointmentItem: React.FC<AppointmentItemProps> = ({
   appointment,
@@ -32,7 +38,7 @@ export const AppointmentItem: React.FC<AppointmentItemProps> = ({
     if (onEdit) {
       onEdit(appointment);
     }
-  };
+  };  
 
   const handleDelete = () => {
     if (onDelete) {

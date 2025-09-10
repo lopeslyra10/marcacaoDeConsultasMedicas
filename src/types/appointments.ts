@@ -11,11 +11,19 @@
  * @property description - Descrição ou motivo da consulta
  * @property status - Status atual da consulta (agendada, realizada, cancelada)
  */
+// src/types/appointments.ts
+
+export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled';
+
 export type Appointment = {
   id: string;
+  patientId: string;
+  patientName: string;
   doctorId: string;
+  doctorName: string;
   date: string;
-  time: string;
-  description: string;
-  status: string;
+  time: string;    
+  description?: string;
+  specialty: string;
+  status: AppointmentStatus;
 };
