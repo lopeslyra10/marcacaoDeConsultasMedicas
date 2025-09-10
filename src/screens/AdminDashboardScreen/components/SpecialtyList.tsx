@@ -1,22 +1,19 @@
 import React from 'react';
-import { Card } from 'react-native-elements';
-import { User } from '@/types/auth';
+import { View, Text } from 'react-native';
 
-type Props = {
-  users: User[];
-};
-
-export default function SpecialtyList({ users }: Props) {
-  const doctors = users.filter((u) => u.role === 'doctor');
-  const specialties = Array.from(new Set(doctors.map((d: any) => d.specialty))).sort();
-
-  return (
-    <Card>
-      <Card.Title>Especialidades Médicas</Card.Title>
-      <Card.Divider />
-      {specialties.map((specialty, index) => (
-        <Card.FeaturedSubtitle key={index}>{specialty}</Card.FeaturedSubtitle>
-      ))}
-    </Card>
-  );
+interface Props {
+  specialties: { [key: string]: number };
 }
+
+export const SpecialtyList: React.FC<Props> = ({ specialties }) => {
+  return (
+    <View style={{ marginBottom: 16 }}>
+      <Text style={{ fontWeight: 'bold' }}>Especialidades mais acessadas:</Text>
+      {Object.entries(specialties).map(([specialty, count]) => (
+        <Text key={specialty}>
+          {specialty}: {count}
+        </Text>
+      ))}
+    </View>
+  );
+};

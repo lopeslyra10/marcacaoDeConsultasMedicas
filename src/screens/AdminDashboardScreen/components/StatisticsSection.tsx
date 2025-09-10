@@ -1,20 +1,20 @@
 import React from 'react';
-import { Card } from 'react-native-elements';
-import { Appointment } from '@/types/appointments';
-import { User } from '@/types/auth';
+import { View, Text } from 'react-native';
+import { Statistics } from '../../../services/statistics';
 
-type Props = {
-  users: User[];
-  appointments: Appointment[];
-};
-
-export default function StatisticsSection({ users, appointments }: Props) {
-  return (
-    <Card>
-      <Card.Title>Estatísticas</Card.Title>
-      <Card.Divider />
-      <Card.FeaturedSubtitle>Total de Usuários: {users.length}</Card.FeaturedSubtitle>
-      <Card.FeaturedSubtitle>Total de Consultas: {appointments.length}</Card.FeaturedSubtitle>
-    </Card>
-  );
+interface Props {
+  statistics: Statistics;
 }
+
+export const StatisticsSection: React.FC<Props> = ({ statistics }) => {
+  return (
+    <View style={{ marginBottom: 16 }}>
+      <Text>Total de Consultas: {statistics.totalAppointments}</Text>
+      <Text>Confirmadas: {statistics.confirmedAppointments}</Text>
+      <Text>Pendentes: {statistics.pendingAppointments}</Text>
+      <Text>Canceladas: {statistics.cancelledAppointments}</Text>
+      <Text>Total de Pacientes: {statistics.totalPatients}</Text>
+      <Text>Total de Médicos: {statistics.totalDoctors}</Text>
+    </View>
+  );
+};
