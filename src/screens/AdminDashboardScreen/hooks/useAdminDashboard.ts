@@ -1,39 +1,49 @@
-import { useState, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { Appointment } from '@/types/appointments';
-import { User } from '@/types/auth';
-import { loadAppointments, loadUsers, updateAppointmentStatus } from '../services/adminDashboardStorage';
+import { useState, useEffect, useCallback } from 'react';
+import { Appointment } from '../../../types/appointments';
+import { statisticsService, Statistics } from '../../../services/statistics';
+import { adminDashboardService } from '../services/adminDashboardStorage';
 
-export function useAdminDashboard() {
+export const useAdminDashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
-    const [storedAppointments, storedUsers] = await Promise.all([
-      loadAppointments(),
-      loadUsers(),
-    ]);
-    setAppointments(storedAppointments);
-    setUsers(storedUsers);
-  };
+  const loadData = useCallback(async () => {
+    try {
+      const data = await adminDashboardService.loadAppointments();
+      setAppointments(data);
 
-  const onRefresh = async () => {
+      const stats = await statisticsService.getGeneralStatistics();
+      setStatistics(stats);
+    } catch (error) {
+      console.error('Erro ao carregar dados do AdminDashboard:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadData();
     setRefreshing(false);
-  };
+  }, [loadData]);
 
   const handleUpdateStatus = async (id: string, status: string) => {
-    const updatedAppointments = await updateAppointmentStatus(id, status);
-    setAppointments(updatedAppointments);
+    try {
+      await adminDashboardService.updateAppointmentStatus(id, status);
+      await loadData();
+    } catch (error) {
+      console.error('Erro ao atualizar status da consulta:', error);
+    }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [])
-  );
-
-  return { appointments, users, refreshing, onRefresh, handleUpdateStatus };
-}
+  return {
+    appointments,
+    statistics,
+    refreshing,
+    onRefresh,
+    handleUpdateStatus,
+  };
+};

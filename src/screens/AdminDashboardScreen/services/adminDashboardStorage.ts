@@ -1,36 +1,39 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Appointment } from '@/types/appointments';
-import { User } from '@/types/auth';
+import { Appointment } from '../../../types/appointments';
 
-const APPOINTMENTS_KEY = 'appointments';
-const USERS_KEY = 'users';
+const APPOINTMENTS_KEY = '@MedicalApp:appointments';
 
-export async function loadAppointments(): Promise<Appointment[]> {
-  const stored = await AsyncStorage.getItem(APPOINTMENTS_KEY);
-  return stored ? JSON.parse(stored) : [];
-}
+export const adminDashboardService = {
+  async loadAppointments(): Promise<Appointment[]> {
+    try {
+      const data = await AsyncStorage.getItem(APPOINTMENTS_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Erro ao carregar consultas:', error);
+      return [];
+    }
+  },
 
-export async function saveAppointments(appointments: Appointment[]) {
-  await AsyncStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
-}
+  async saveAppointments(appointments: Appointment[]): Promise<void> {
+    try {
+      await AsyncStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    } catch (error) {
+      console.error('Erro ao salvar consultas:', error);
+    }
+  },
 
-export async function loadUsers(): Promise<User[]> {
-  const stored = await AsyncStorage.getItem(USERS_KEY);
-  return stored ? JSON.parse(stored) : [];
-}
-
-export async function saveUsers(users: User[]) {
-  await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-export async function updateAppointmentStatus(
-  id: string,
-  status: string
-): Promise<Appointment[]> {
-  const appointments = await loadAppointments();
-  const updated = appointments.map((a) =>
-    a.id === id ? { ...a, status } : a
-  );
-  await saveAppointments(updated);
-  return updated;
-}
+  async updateAppointmentStatus(
+    id: string,
+    status: string
+  ): Promise<void> {
+    try {
+      const appointments = await this.loadAppointments();
+      const updated = appointments.map((a) =>
+        a.id === id ? { ...a, status } : a
+      );
+      await this.saveAppointments(updated);
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+    }
+  },
+};
