@@ -7,7 +7,11 @@ export const mockAppointments: Appointment[] = [
     time: '14:00',
     status: 'pending',
     doctorId: '1',
-    description: 'Cardiologista'
+    doctorName: 'Dr. João',
+    patientId: 'p1',
+    patientName: 'Maria Silva',
+    specialty: 'Cardiologia',
+    description: 'Cardiologista',
   },
   {
     id: '2',
@@ -15,6 +19,10 @@ export const mockAppointments: Appointment[] = [
     time: '09:30',
     status: 'completed',
     doctorId: '1',
-    description: 'Odontologista'
+    doctorName: 'Dr. João',
+    patientId: 'p2',
+    patientName: 'Carlos Souza',
+    specialty: 'Odontologia',
+    description: 'Odontologista',
   },
 ];

@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Appointment } from '../../../types/appointments';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Appointment, AppointmentStatus } from "../../../types/appointments";
 
-const APPOINTMENTS_KEY = '@MedicalApp:appointments';
+const APPOINTMENTS_KEY = "@MedicalApp:appointments";
 
 export const adminDashboardService = {
   async loadAppointments(): Promise<Appointment[]> {
@@ -9,22 +9,25 @@ export const adminDashboardService = {
       const data = await AsyncStorage.getItem(APPOINTMENTS_KEY);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
+      console.error("Erro ao carregar consultas:", error);
       return [];
     }
   },
 
   async saveAppointments(appointments: Appointment[]): Promise<void> {
     try {
-      await AsyncStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+      await AsyncStorage.setItem(
+        APPOINTMENTS_KEY,
+        JSON.stringify(appointments)
+      );
     } catch (error) {
-      console.error('Erro ao salvar consultas:', error);
+      console.error("Erro ao salvar consultas:", error);
     }
   },
 
   async updateAppointmentStatus(
     id: string,
-    status: string
+    status: AppointmentStatus
   ): Promise<void> {
     try {
       const appointments = await this.loadAppointments();
@@ -33,7 +36,7 @@ export const adminDashboardService = {
       );
       await this.saveAppointments(updated);
     } catch (error) {
-      console.error('Erro ao atualizar status:', error);
+      console.error("Erro ao atualizar status:", error);
     }
   },
 };

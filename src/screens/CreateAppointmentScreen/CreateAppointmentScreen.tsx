@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { ScrollView, ViewStyle } from 'react-native';
 import { Button, Input } from 'react-native-elements';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
-import DoctorList from '../components/DoctorList';
-import TimeSlotList from '../components/TimeSlotList';
+import { RootStackParamList } from '../../types/navigation';
+import theme from '../../styles/theme';
+import Header from '../../components/Header';
+import DoctorList from '../../components/DoctorList';
+import TimeSlotList from '../../components/TimeSlotList';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { notificationService } from '../services/notifications';
+import { notificationService } from '../../services/notifications';
 
 type CreateAppointmentScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'CreateAppointment'>;

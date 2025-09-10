@@ -13,7 +13,7 @@
  */
 // src/types/appointments.ts
 
-export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled';
+export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 
 export type Appointment = {
   id: string;

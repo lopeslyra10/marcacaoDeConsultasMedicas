@@ -35,7 +35,7 @@ const AdminDashboardScreen: React.FC = () => {
         <HeaderTitle>Painel do Administrador</HeaderTitle>
       </HeaderContainer>
       <Content>
-        <StatisticsSection statistics={statistics} />
+        <StatisticsSection statistics={statistics || { total: 0, specialties: {} }} />
         <SpecialtyList specialties={statistics?.specialties || {}} />
 
         <AppointmentList

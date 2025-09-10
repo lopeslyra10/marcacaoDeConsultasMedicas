@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { Appointment, AppointmentStatus } from '../../../types/appointments';
 
 interface Props {
   appointmentsByMonth: { [key: string]: number };

@@ -3,10 +3,14 @@ import { View, Text } from 'react-native';
 import { Statistics } from '../../../services/statistics';
 
 interface Props {
-  statistics: Statistics;
+  statistics?: Statistics;
 }
 
 export const StatisticsSection: React.FC<Props> = ({ statistics }) => {
+  if (!statistics) {
+    return <Text>Nenhuma estatística encontrada</Text>;
+  }
+
   return (
     <View style={{ marginBottom: 16 }}>
       <Text>Total de Consultas: {statistics.totalAppointments}</Text>
@@ -18,3 +22,4 @@ export const StatisticsSection: React.FC<Props> = ({ statistics }) => {
     </View>
   );
 };
+
