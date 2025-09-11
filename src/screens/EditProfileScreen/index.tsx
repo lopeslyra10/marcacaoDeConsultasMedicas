@@ -1,36 +1,95 @@
 import React from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
-import { Container, Title } from './styles';
-import { useAdminDashboard } from './hooks/useAdminDashboard';
+import { Button, Input } from 'react-native-elements';
+import { useEditProfile } from './hooks/useEditProfile';
+import Header from '../../components/Header'; // Ajuste o caminho
+import ProfileImagePicker from '../../components/ProfileImagePicker'; // Ajuste o caminho
+import * as S from './styles';
 
-import AppointmentCard from '../../components/AppointmentCard';
-import StatisticsSection from './components/StatisticsSection';
-import SpecialtyList from './components/SpecialtyList';
+const EditProfileScreen: React.FC = () => {
+  const {
+    user,
+    name,
+    setName,
+    email,
+    setEmail,
+    specialty,
+    setSpecialty,
+    profileImage,
+    loading,
+    handleImageSelected,
+    handleSaveProfile,
+    handleCancel,
+  } = useEditProfile();
 
-export default function AdminDashboard() {
-  const { appointments, users, refreshing, onRefresh, handleUpdateStatus } = useAdminDashboard();
+  const userRole = user?.role || '';
 
   return (
-    <Container>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <Title>Painel Administrativo</Title>
+    <S.Container>
+      <Header />
+      <S.ScrollContainer>
+        <S.Title>Editar Perfil</S.Title>
 
-        <StatisticsSection users={users} appointments={appointments} />
-
-        <SpecialtyList users={users} />
-
-        {appointments.map((appointment) => (
-          <AppointmentCard
-            key={appointment.id}
-            appointment={appointment}
-            onUpdateStatus={handleUpdateStatus}
+        <S.ProfileCard>
+          <ProfileImagePicker
+            currentImageUri={profileImage}
+            onImageSelected={handleImageSelected}
+            size={120}
           />
-        ))}
-      </ScrollView>
-    </Container>
+
+          <Input
+            label="Nome"
+            value={name}
+            onChangeText={setName}
+            containerStyle={S.elementStyles.input}
+            placeholder="Digite seu nome"
+          />
+
+          <Input
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            containerStyle={S.elementStyles.input}
+            placeholder="Digite seu email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          {userRole === 'doctor' && (
+            <Input
+              label="Especialidade"
+              value={specialty}
+              onChangeText={setSpecialty}
+              containerStyle={S.elementStyles.input}
+              placeholder="Digite sua especialidade"
+            />
+          )}
+
+          <S.RoleBadge role={userRole}>
+            <S.RoleText>
+              {userRole === 'admin' ? 'Administrador' : userRole === 'doctor' ? 'Médico' : 'Paciente'}
+            </S.RoleText>
+          </S.RoleBadge>
+        </S.ProfileCard>
+
+        <Button
+          title="Salvar Alterações"
+          onPress={handleSaveProfile}
+          loading={loading}
+          disabled={loading}
+          containerStyle={S.elementStyles.buttonContainer}
+          buttonStyle={S.elementStyles.saveButton}
+        />
+
+        <Button
+          title="Cancelar"
+          onPress={handleCancel}
+          disabled={loading}
+          containerStyle={S.elementStyles.buttonContainer}
+          buttonStyle={S.elementStyles.cancelButton}
+        />
+      </S.ScrollContainer>
+    </S.Container>
   );
-}
+};
+
+export default EditProfileScreen;
