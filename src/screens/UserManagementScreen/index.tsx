@@ -1,36 +1,67 @@
 import React from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
-import { Container, Title } from './styles';
-import { useAdminDashboard } from './hooks/useAdminDashboard';
+import { FlatList } from 'react-native';
+import { Button } from 'react-native-elements';
+import { useUserManagement } from './hooks/useUserManagement';
+import Header from '../../components/Header'; // Ajuste o caminho
+import UserItem from './components/UserItem';
+import * as S from './styles';
 
-import AppointmentCard from './components/AppointmentCard';
-import StatisticsSection from './components/StatisticsSection';
-import SpecialtyList from './components/SpecialtyList';
+const UserManagementScreen: React.FC = () => {
+  const {
+    loading,
+    users,
+    handleDeleteUser,
+    handleAddNewUser,
+    handleEditUser,
+    handleGoBack,
+  } = useUserManagement();
 
-export default function AdminDashboard() {
-  const { appointments, users, refreshing, onRefresh, handleUpdateStatus } = useAdminDashboard();
+  if (loading) {
+    return (
+      <S.Container>
+        <Header />
+        <S.LoadingText>Carregando usuários...</S.LoadingText>
+      </S.Container>
+    );
+  }
 
   return (
-    <Container>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <Title>Painel Administrativo</Title>
-
-        <StatisticsSection users={users} appointments={appointments} />
-
-        <SpecialtyList users={users} />
-
-        {appointments.map((appointment) => (
-          <AppointmentCard
-            key={appointment.id}
-            appointment={appointment}
-            onUpdateStatus={handleUpdateStatus}
+    <S.Container>
+      <Header />
+      <FlatList
+        data={users}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <UserItem
+            user={item}
+            onEdit={handleEditUser}
+            onDelete={handleDeleteUser}
           />
-        ))}
-      </ScrollView>
-    </Container>
+        )}
+        ListHeaderComponent={
+          <>
+            <S.Title>Gerenciar Usuários</S.Title>
+            <Button
+              title="Adicionar Novo Usuário"
+              onPress={handleAddNewUser}
+              containerStyle={S.elementStyles.buttonContainer}
+              buttonStyle={S.elementStyles.primaryButton}
+            />
+          </>
+        }
+        ListFooterComponent={
+          <Button
+            title="Voltar"
+            onPress={handleGoBack}
+            containerStyle={S.elementStyles.buttonContainer}
+            buttonStyle={S.elementStyles.backButton}
+          />
+        }
+        ListEmptyComponent={<S.EmptyText>Nenhum outro usuário cadastrado</S.EmptyText>}
+        contentContainerStyle={{ padding: 20 }}
+      />
+    </S.Container>
   );
-}
+};
+
+export default UserManagementScreen;
