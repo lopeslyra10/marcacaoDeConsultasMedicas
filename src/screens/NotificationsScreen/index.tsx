@@ -1,36 +1,87 @@
 import React from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
-import { Container, Title } from './styles';
-import { useAdminDashboard } from './hooks/useAdminDashboard';
+import { FlatList } from 'react-native';
+import { Button, Badge } from 'react-native-elements';
+import { useNotifications } from './hooks/useNotifications';
+import Header from '../../components/Header'; // Ajuste o caminho
+import NotificationItem from './components/NotificationItem';
+import * as S from './styles';
 
-import AppointmentCard from './components/AppointmentCard';
-import StatisticsSection from './components/StatisticsSection';
-import SpecialtyList from './components/SpecialtyList';
+const NotificationsScreen: React.FC = () => {
+  const {
+    loading,
+    notifications,
+    unreadCount,
+    handleMarkAsRead,
+    handleMarkAllAsRead,
+    handleDeleteNotification,
+    handleGoBack,
+  } = useNotifications();
 
-export default function AdminDashboard() {
-  const { appointments, users, refreshing, onRefresh, handleUpdateStatus } = useAdminDashboard();
+  const renderHeader = () => (
+    <>
+      <S.TitleContainer>
+        <S.Title>Notificações</S.Title>
+        {unreadCount > 0 && (
+          <Badge
+            value={unreadCount}
+            status="error"
+            containerStyle={S.elementStyles.badge}
+          />
+        )}
+      </S.TitleContainer>
+
+      {unreadCount > 0 && (
+        <Button
+          title="Marcar todas como lidas"
+          onPress={handleMarkAllAsRead}
+          containerStyle={S.elementStyles.markAllButtonContainer}
+          buttonStyle={S.elementStyles.markAllButton}
+        />
+      )}
+
+      <Button
+        title="Voltar"
+        type="outline"
+        onPress={handleGoBack}
+        containerStyle={S.elementStyles.backButtonContainer}
+        buttonStyle={S.elementStyles.backButton}
+        titleStyle={S.elementStyles.backButtonTitle}
+      />
+    </>
+  );
+
+  if (loading) {
+    return (
+      <S.Container>
+        <Header />
+        <S.LoadingText>Carregando notificações...</S.LoadingText>
+      </S.Container>
+    );
+  }
 
   return (
-    <Container>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <Title>Painel Administrativo</Title>
-
-        <StatisticsSection users={users} appointments={appointments} />
-
-        <SpecialtyList users={users} />
-
-        {appointments.map((appointment) => (
-          <AppointmentCard
-            key={appointment.id}
-            appointment={appointment}
-            onUpdateStatus={handleUpdateStatus}
+    <S.Container>
+      <Header />
+      <FlatList
+        data={notifications}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <NotificationItem
+            notification={item}
+            onMarkAsRead={handleMarkAsRead}
+            onDelete={handleDeleteNotification}
           />
-        ))}
-      </ScrollView>
-    </Container>
+        )}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={
+          <S.EmptyContainer>
+            <S.EmptyText>Nenhuma notificação encontrada</S.EmptyText>
+          </S.EmptyContainer>
+        }
+        contentContainerStyle={{ padding: 20 }}
+      />
+    </S.Container>
   );
-}
+};
+
+export default NotificationsScreen;
