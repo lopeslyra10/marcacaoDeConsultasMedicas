@@ -1,36 +1,72 @@
 import React from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
-import { Container, Title } from './styles';
-import { useAdminDashboard } from './hooks/useAdminDashboard';
+import { Input, Button } from 'react-native-elements';
+import { useLogin } from './hooks/useLogin';
+import { credentials } from './models/credentials';
+import * as S from './styles'; // Importa tudo de styles.ts como 'S'
 
-import AppointmentCard from './components/AppointmentCard';
-import StatisticsSection from './components/StatisticsSection';
-import SpecialtyList from './components/SpecialtyList';
-
-export default function AdminDashboard() {
-  const { appointments, users, refreshing, onRefresh, handleUpdateStatus } = useAdminDashboard();
+const LoginScreen: React.FC = () => {
+  // O hook provê todo o estado e a lógica necessários
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    loading,
+    error,
+    handleLogin,
+    handleGoToRegister,
+  } = useLogin();
 
   return (
-    <Container>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <Title>Painel Administrativo</Title>
+    <S.Container>
+      <S.Title>Bem-vindo!</S.Title>
+      
+      <Input
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        containerStyle={S.elementStyles.inputContainer}
+      />
 
-        <StatisticsSection users={users} appointments={appointments} />
+      <Input
+        placeholder="Senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        containerStyle={S.elementStyles.inputContainer}
+      />
 
-        <SpecialtyList users={users} />
+      {error ? <S.ErrorText>{error}</S.ErrorText> : null}
 
-        {appointments.map((appointment) => (
-          <AppointmentCard
-            key={appointment.id}
-            appointment={appointment}
-            onUpdateStatus={handleUpdateStatus}
-          />
-        ))}
-      </ScrollView>
-    </Container>
+      <Button
+        title="Entrar"
+        onPress={handleLogin}
+        loading={loading}
+        disabled={loading}
+        containerStyle={S.elementStyles.buttonContainer}
+        buttonStyle={S.elementStyles.loginButton}
+      />
+
+      <Button
+        title="Cadastrar Novo Paciente"
+        type="outline" // Fica melhor com o estilo que definimos
+        onPress={handleGoToRegister}
+        containerStyle={S.elementStyles.buttonContainer}
+        buttonStyle={S.elementStyles.registerButton}
+        titleStyle={S.elementStyles.registerButtonTitle}
+      />
+
+      <S.CredentialsContainer>
+        <S.HintText>{credentials.hint}</S.HintText>
+        <S.CredentialsText>
+          {credentials.admin}{'\n'}
+          {credentials.doctors}
+        </S.CredentialsText>
+      </S.CredentialsContainer>
+    </S.Container>
   );
-}
+};
+
+export default LoginScreen;

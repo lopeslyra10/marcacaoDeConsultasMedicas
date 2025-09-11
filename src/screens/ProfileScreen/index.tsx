@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, RefreshControl } from 'react-native';
 import { Container, Title } from './styles';
-import { useAdminDashboard } from './hooks/useAdminDashboard';
+import { useAdminDashboard } from '../hooks/useAdminDashboard';
 
 import AppointmentCard from './components/AppointmentCard';
 import StatisticsSection from './components/StatisticsSection';

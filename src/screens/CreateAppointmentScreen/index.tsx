@@ -9,7 +9,6 @@ import { useCreateAppointment } from './hooks/useCreateAppointment';
 import Header from '../../components/Header';
 import DoctorList from '../../components/DoctorList';
 import TimeSlotList from '../../components/TimeSlotList';
-import theme from '../../styles/theme';
 
 import {
   Container,

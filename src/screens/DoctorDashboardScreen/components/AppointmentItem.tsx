@@ -1,6 +1,5 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
-import { Appointment } from '../../../types/appointments';
 import { Appointment as BaseAppointment } from '../../../types/appointments';
 import { getPatientInfo } from '../models/patients';
 import theme from '../../../styles/theme';
