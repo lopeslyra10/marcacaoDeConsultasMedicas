@@ -1,36 +1,68 @@
 import React from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
-import { Container, Title } from './styles';
-import { useAdminDashboard } from './hooks/useAdminDashboard';
+import { FlatList } from 'react-native';
+import { Button } from 'react-native-elements';
+import { usePatientDashboard } from './hooks/usePatientDashboard';
+import Header from '../../components/Header';
+import AppointmentItem from './components/AppointmentItem';
+import * as S from './styles';
 
-import AppointmentCard from './components/AppointmentCard';
-import StatisticsSection from './components/StatisticsSection';
-import SpecialtyList from './components/SpecialtyList';
+const PatientDashboardScreen: React.FC = () => {
+  const { loading, appointments, signOut, handleNavigate } = usePatientDashboard();
 
-export default function AdminDashboard() {
-  const { appointments, users, refreshing, onRefresh, handleUpdateStatus } = useAdminDashboard();
+  const renderListHeader = () => (
+    <>
+      <S.Title>Minhas Consultas</S.Title>
+      <Button
+        title="Agendar Nova Consulta"
+        onPress={() => handleNavigate('CreateAppointment')}
+        containerStyle={S.elementStyles.buttonContainer}
+        buttonStyle={S.elementStyles.primaryButton}
+      />
+      <Button
+        title="Meu Perfil"
+        onPress={() => handleNavigate('Profile')}
+        containerStyle={S.elementStyles.buttonContainer}
+        buttonStyle={S.elementStyles.secondaryButton}
+      />
+      <Button
+        title="Configurações"
+        onPress={() => handleNavigate('Settings')}
+        containerStyle={S.elementStyles.buttonContainer}
+        buttonStyle={S.elementStyles.secondaryButton}
+      />
+    </>
+  );
+
+  if (loading) {
+    return (
+      <S.Container>
+        <Header />
+        <S.LoadingText>Carregando...</S.LoadingText>
+      </S.Container>
+    );
+  }
 
   return (
-    <Container>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <Title>Painel Administrativo</Title>
-
-        <StatisticsSection users={users} appointments={appointments} />
-
-        <SpecialtyList users={users} />
-
-        {appointments.map((appointment) => (
-          <AppointmentCard
-            key={appointment.id}
-            appointment={appointment}
-            onUpdateStatus={handleUpdateStatus}
+    <S.Container>
+      <Header />
+      <FlatList
+        data={appointments}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item })- => <AppointmentItem appointment={item} />}
+        ListHeaderComponent={renderListHeader}
+        ListFooterComponent={
+          <Button
+            title="Sair"
+            onPress={signOut}
+            containerStyle={S.elementStyles.buttonContainer}
+            buttonStyle={S.elementStyles.logoutButton}
           />
-        ))}
-      </ScrollView>
-    </Container>
+        }
+        ListEmptyComponent={<S.EmptyText>Nenhuma consulta agendada</S.EmptyText>}
+        contentContainerStyle={{ padding: 20 }}
+      />
+    </S.Container>
   );
-}
+};
+
+export default PatientDashboardScreen;
