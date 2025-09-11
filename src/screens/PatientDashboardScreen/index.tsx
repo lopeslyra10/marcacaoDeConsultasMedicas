@@ -48,7 +48,7 @@ const PatientDashboardScreen: React.FC = () => {
       <FlatList
         data={appointments}
         keyExtractor={(item) => item.id}
-        renderItem={({ item })- => <AppointmentItem appointment={item} />}
+        renderItem={({ item }) => <AppointmentItem appointment={item} />}
         ListHeaderComponent={renderListHeader}
         ListFooterComponent={
           <Button
