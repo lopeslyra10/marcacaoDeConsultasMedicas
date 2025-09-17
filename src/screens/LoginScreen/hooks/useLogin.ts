@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../../../contexts/AuthContext'; 
-import { RootStackParamList } from '../../../types/navigation'; 
-
-// Tipo para a propriedade de navegação específica desta tela
-type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+import { useAuth } from '../../../contexts/AuthContext';
+import { RootStackParamList } from '../../../types';
+import { LoginService } from '../services/loginService';
 
 export const useLogin = () => {
   const { signIn } = useAuth();
-  const navigation = useNavigation<LoginNavigationProp>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,29 +15,28 @@ export const useLogin = () => {
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
-    
-    if (!email || !password) {
-      setError('Por favor, preencha o email e a senha.');
+    if (!email.trim() || !password.trim()) {
+      setError('Por favor, preencha todos os campos.');
       return;
     }
-    
+
+    setLoading(true);
+    setError('');
+
     try {
-      setLoading(true);
-      setError('');
-      await signIn({ email, password });
-      
-    } catch (err) {
-      setError('Email ou senha inválidos. Tente novamente.');
+      // O hook chama o serviço para executar a ação
+      await LoginService.login(signIn, { email, password });
+      // O AuthContext cuidará da navegação após o sucesso
+    } catch (err: any) {
+      setError(err.message || 'Erro ao tentar fazer login.');
     } finally {
       setLoading(false);
     }
   };
-  
- 
+
   const handleGoToRegister = () => {
     navigation.navigate('Register');
   };
-
 
   return {
     email,

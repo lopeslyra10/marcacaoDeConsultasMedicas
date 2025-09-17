@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Input } from 'react-native-elements';
 import { useEditProfile } from './hooks/useEditProfile';
-import Header from '../../components/Header'; // Ajuste o caminho
-import ProfileImagePicker from '../../components/ProfileImagePicker'; // Ajuste o caminho
+import Header from '../../components/Header';
+import ProfileImagePicker from '../../components/ProfileImagePicker'; 
 import * as S from './styles';
 
 const EditProfileScreen: React.FC = () => {

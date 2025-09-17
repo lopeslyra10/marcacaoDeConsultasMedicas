@@ -2,31 +2,26 @@ import React from 'react';
 import { FlatList } from 'react-native';
 import { Button } from 'react-native-elements';
 import { useUserManagement } from './hooks/useUserManagement';
-import Header from '../../components/Header'; // Ajuste o caminho
+import Header from '../../components/Header';
 import UserItem from './components/UserItem';
-import * as S from './styles';
+import { Container, Title, LoadingText, EmptyText, elementStyles } from './styles';
 
 const UserManagementScreen: React.FC = () => {
   const {
-    loading,
-    users,
-    handleDeleteUser,
-    handleAddNewUser,
-    handleEditUser,
-    handleGoBack,
+    loading, users, handleDeleteUser, handleAddNewUser, handleEditUser, handleGoBack,
   } = useUserManagement();
 
   if (loading) {
     return (
-      <S.Container>
+      <Container>
         <Header />
-        <S.LoadingText>Carregando usuários...</S.LoadingText>
-      </S.Container>
+        <LoadingText>Carregando usuários...</LoadingText>
+      </Container>
     );
   }
 
   return (
-    <S.Container>
+    <Container>
       <Header />
       <FlatList
         data={users}
@@ -40,12 +35,12 @@ const UserManagementScreen: React.FC = () => {
         )}
         ListHeaderComponent={
           <>
-            <S.Title>Gerenciar Usuários</S.Title>
+            <Title>Gerenciar Usuários</Title>
             <Button
               title="Adicionar Novo Usuário"
               onPress={handleAddNewUser}
-              containerStyle={S.elementStyles.buttonContainer}
-              buttonStyle={S.elementStyles.primaryButton}
+              containerStyle={elementStyles.button as ViewStyle}
+              buttonStyle={elementStyles.buttonStyle}
             />
           </>
         }
@@ -53,14 +48,14 @@ const UserManagementScreen: React.FC = () => {
           <Button
             title="Voltar"
             onPress={handleGoBack}
-            containerStyle={S.elementStyles.buttonContainer}
-            buttonStyle={S.elementStyles.backButton}
+            containerStyle={elementStyles.button as ViewStyle}
+            buttonStyle={elementStyles.backButton}
           />
         }
-        ListEmptyComponent={<S.EmptyText>Nenhum outro usuário cadastrado</S.EmptyText>}
+        ListEmptyComponent={<EmptyText>Nenhum outro usuário cadastrado</EmptyText>}
         contentContainerStyle={{ padding: 20 }}
       />
-    </S.Container>
+    </Container>
   );
 };
 

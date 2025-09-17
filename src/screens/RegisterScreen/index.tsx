@@ -1,16 +1,17 @@
 import React from 'react';
 import { Input, Button } from 'react-native-elements';
 import { useRegister } from './hooks/useRegister';
-import * as S from './styles';
+import {
+  Container, Title, ErrorText, SectionTitle,
+  UserTypeContainer, UserTypeButton, UserTypeText, elementStyles,
+} from './styles';
 
 const RegisterScreen: React.FC = () => {
   const {
-    name,
-    setName,
-    email,
-    setEmail,
-    password,
-    setPassword,
+    name, setName,
+    email, setEmail,
+    password, setPassword,
+    userType, setUserType,
     loading,
     error,
     handleRegister,
@@ -18,15 +19,15 @@ const RegisterScreen: React.FC = () => {
   } = useRegister();
 
   return (
-    <S.Container>
-      <S.Title>Cadastro de Paciente</S.Title>
+    <Container>
+      <Title>Cadastro de Usuário</Title>
       
       <Input
         placeholder="Nome completo"
         value={name}
         onChangeText={setName}
         autoCapitalize="words"
-        containerStyle={S.elementStyles.input}
+        containerStyle={elementStyles.input}
       />
 
       <Input
@@ -35,38 +36,48 @@ const RegisterScreen: React.FC = () => {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
-        containerStyle={S.elementStyles.input}
+        containerStyle={elementStyles.input}
       />
 
       <Input
-        placeholder="Senha (mínimo 6 caracteres)"
+        placeholder="Senha"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        containerStyle={S.elementStyles.input}
+        containerStyle={elementStyles.input}
       />
 
-      {error ? <S.ErrorText>{error}</S.ErrorText> : <S.ErrorText> </S.ErrorText>}
+      <SectionTitle>Tipo de Usuário</SectionTitle>
+      <UserTypeContainer>
+        <UserTypeButton selected={userType === 'PACIENTE'} onPress={() => setUserType('PACIENTE')}>
+          <UserTypeText selected={userType === 'PACIENTE'}>👤 Paciente</UserTypeText>
+        </UserTypeButton>
+        <UserTypeButton selected={userType === 'ADMIN'} onPress={() => setUserType('ADMIN')}>
+          <UserTypeText selected={userType === 'ADMIN'}>🔧 Administrador</UserTypeText>
+        </UserTypeButton>
+      </UserTypeContainer>
+
+      {error ? <ErrorText>{error}</ErrorText> : <ErrorText> </ErrorText>}
 
       <Button
         title="Cadastrar"
         onPress={handleRegister}
         loading={loading}
         disabled={loading}
-        containerStyle={S.elementStyles.buttonContainer}
-        buttonStyle={S.elementStyles.registerButton}
+        containerStyle={elementStyles.button}
+        buttonStyle={elementStyles.buttonStyle}
       />
 
       <Button
-        title="Já tenho uma conta"
+        title="Voltar para Login"
         type="clear"
         onPress={handleGoToLogin}
         disabled={loading}
-        containerStyle={S.elementStyles.buttonContainer}
-        buttonStyle={S.elementStyles.backButton}
-        titleStyle={S.elementStyles.backButtonTitle}
+        containerStyle={elementStyles.backButton}
+        buttonStyle={elementStyles.backButtonStyle}
+        titleStyle={elementStyles.backButtonTitle}
       />
-    </S.Container>
+    </Container>
   );
 };
 

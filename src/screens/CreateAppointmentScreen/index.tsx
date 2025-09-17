@@ -1,42 +1,28 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
 import { Button, Input } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-import { RootStackParamList } from '../../types/navigation';
 import { useCreateAppointment } from './hooks/useCreateAppointment';
+import { convertUsersToDoctors } from './models/doctorModel';
+import { Container, Title, SectionTitle, ErrorText, styles } from './styles';
 import Header from '../../components/Header';
 import DoctorList from '../../components/DoctorList';
 import TimeSlotList from '../../components/TimeSlotList';
 
-import {
-  Container,
-  Title,
-  SectionTitle,
-  ErrorText,
-  styles,
-} from './styles';
-
-type CreateAppointmentScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'CreateAppointment'>;
-};
-
 const CreateAppointmentScreen: React.FC = () => {
-  const navigation = useNavigation<CreateAppointmentScreenProps['navigation']>();
-
   const {
-    date,
-    setDate,
-    selectedTime,
-    setSelectedTime,
-    selectedDoctor,
-    setSelectedDoctor,
-    error,
+    date, setDate,
+    selectedTime, setSelectedTime,
+    selectedDoctorId, setSelectedDoctorId,
+    doctors,
     loading,
-    availableDoctors,
-    handleCreateAppointment,
-  } = useCreateAppointment({ navigation });
+    error,
+    handleSave,
+  } = useCreateAppointment();
+
+  const navigation = useNavigation();
+
+  // Converte os dados para o formato que o DoctorList espera
+  const doctorListData = convertUsersToDoctors(doctors);
 
   return (
     <Container>
@@ -59,26 +45,30 @@ const CreateAppointmentScreen: React.FC = () => {
         />
 
         <SectionTitle>Selecione um Médico</SectionTitle>
-        <DoctorList
-          doctors={availableDoctors}
-          onSelectDoctor={setSelectedDoctor}
-          selectedDoctorId={selectedDoctor?.id}
-        />
-
+        {loading && doctors.length === 0 ? (
+          <ErrorText>Carregando médicos...</ErrorText>
+        ) : (
+          <DoctorList
+            doctors={doctorListData}
+            onSelectDoctor={(doctor) => setSelectedDoctorId(doctor.id)}
+            selectedDoctorId={selectedDoctorId}
+          />
+        )}
+        
         {error ? <ErrorText>{error}</ErrorText> : null}
 
         <Button
           title="Agendar"
-          onPress={handleCreateAppointment}
+          onPress={handleSave}
           loading={loading}
-          containerStyle={styles.button}
+          containerStyle={styles.button as any}
           buttonStyle={styles.buttonStyle}
         />
 
         <Button
           title="Cancelar"
           onPress={() => navigation.goBack()}
-          containerStyle={styles.button}
+          containerStyle={styles.button as any}
           buttonStyle={styles.cancelButton}
         />
       </ScrollView>

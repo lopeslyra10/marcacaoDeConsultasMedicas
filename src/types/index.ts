@@ -1,3 +1,3 @@
-import { Doctor } from './doctors';
-import { RootStackParamList } from './navigation';
-export {Appointment} from './appointments';
+export { Appointment } from './appointments';
+export { Doctor } from './doctors';
+export { RootStackParamList } from './navigation';

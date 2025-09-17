@@ -1,71 +1,76 @@
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { Button } from 'react-native-elements';
 import { useProfile } from './hooks/useProfile';
-import Header from '../../components/Header'; 
-import ProfileImagePicker from '../../components/ProfileImagePicker';
-import * as S from './styles';
+import Header from '../../components/Header';
+import {
+  Container, ScrollView, Title, ProfileCard, Avatar,
+  Name, Email, RoleBadge, RoleText, SpecialtyText, elementStyles,
+} from './styles';
 
 const ProfileScreen: React.FC = () => {
-  const { user, signOut, getRoleText, handleEditProfile, handleGoBack } = useProfile();
+  const {
+    user,
+    signOut,
+    getRoleText,
+    handleEditProfile,
+    handleGoBack,
+  } = useProfile();
 
   if (!user) {
+    // Estado de fallback caso o usuário ainda não tenha sido carregado
     return (
-      <S.Container>
+      <Container>
         <Header />
-        <S.Title>Carregando perfil...</S.Title>
-      </S.Container>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator size="large" />
+        </View>
+      </Container>
     );
   }
 
-  const userRole = user.role || '';
-
   return (
-    <S.Container>
+    <Container>
       <Header />
-      <S.ScrollView>
-        <S.Title>Meu Perfil</S.Title>
+      <ScrollView>
+        <Title>Meu Perfil</Title>
 
-        <S.ProfileCard>
-          <ProfileImagePicker
-            currentImageUri={user.image}
-            onImageSelected={() => {}} // É somente leitura
-            size={120}
-            editable={false}
-          />
-          <S.Name>{user.name}</S.Name>
-          <S.Email>{user.email}</S.Email>
-
-          <S.RoleBadge role={userRole}>
-            <S.RoleText>{getRoleText(userRole)}</S.RoleText>
-          </S.RoleBadge>
-
-          {userRole === 'doctor' && user.specialty && (
-            <S.SpecialtyText>Especialidade: {user.specialty}</S.SpecialtyText>
+        <ProfileCard>
+          <Avatar source={{ uri: user.image || 'https://via.placeholder.com/150' }} />
+          <Name>{user.name}</Name>
+          <Email>{user.email}</Email>
+          
+          <RoleBadge role={user.role}>
+            <RoleText>{getRoleText(user.role)}</RoleText>
+          </RoleBadge>
+          
+          {user.role === 'doctor' && 'specialty' in user && (
+            <SpecialtyText>Especialidade: {user.specialty}</SpecialtyText>
           )}
-        </S.ProfileCard>
+        </ProfileCard>
 
         <Button
           title="Editar Perfil"
           onPress={handleEditProfile}
-          containerStyle={S.elementStyles.buttonContainer}
-          buttonStyle={S.elementStyles.editButton}
+          containerStyle={elementStyles.buttonContainer}
+          buttonStyle={elementStyles.editButton}
         />
 
         <Button
           title="Voltar"
           onPress={handleGoBack}
-          containerStyle={S.elementStyles.buttonContainer}
-          buttonStyle={S.elementStyles.backButton}
+          containerStyle={elementStyles.buttonContainer}
+          buttonStyle={elementStyles.backButton}
         />
 
         <Button
           title="Sair"
           onPress={signOut}
-          containerStyle={S.elementStyles.buttonContainer}
-          buttonStyle={S.elementStyles.logoutButton}
+          containerStyle={elementStyles.buttonContainer}
+          buttonStyle={elementStyles.logoutButton}
         />
-      </S.ScrollView>
-    </S.Container>
+      </ScrollView>
+    </Container>
   );
 };
 

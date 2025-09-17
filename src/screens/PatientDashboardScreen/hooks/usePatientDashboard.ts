@@ -1,27 +1,37 @@
-import React, { useState } from 'react';
+// src/screens/PatientDashboardScreen/hooks/usePatientDashboard.ts
+import { useState, useCallback } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAuth } from '../../../contexts/AuthContext';
+import { RootStackParamList, Appointment, User } from '../../../types';
+import { PatientDashboardService } from '../services/patientDashboardServices';
+import theme from '../../../styles/theme';
 
-import { useAuth } from '../../../contexts/AuthContext'; 
-import { RootStackParamList } from '../../../types/navigation'; 
-import { Appointment } from '../../../types/appointments'; 
-import theme from '../../../styles/theme'; 
+export type EnrichedAppointment = Appointment & {
+  doctorName?: string;
+  specialty?: string;
+};
 
-
-export const getStatusColor = (status: Appointment['status']) => {
+// Funções helper preenchidas
+export const getStatusColor = (status: string) => {
   switch (status) {
-    case 'confirmed': return theme.colors.success;
-    case 'cancelled': return theme.colors.error;
-    default: return theme.colors.warning;
+    case 'confirmed':
+      return theme.colors.success;
+    case 'cancelled':
+      return theme.colors.error;
+    default:
+      return theme.colors.warning;
   }
 };
 
-export const getStatusText = (status: Appointment['status']) => {
+export const getStatusText = (status: string) => {
   switch (status) {
-    case 'confirmed': return 'Confirmada';
-    case 'cancelled': return 'Cancelada';
-    default: return 'Pendente';
+    case 'confirmed':
+      return 'Confirmada';
+    case 'cancelled':
+      return 'Cancelada';
+    default:
+      return 'Pendente';
   }
 };
 
@@ -30,32 +40,36 @@ export const usePatientDashboard = () => {
   const { user, signOut } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [appointments, setAppointments] = useState<EnrichedAppointment[]>([]);
   const [loading, setLoading] = useState(true);
 
-
-  const loadAppointments = React.useCallback(async () => {
-    if (!user?.id) return;
+  const loadData = useCallback(async () => {
+    if (!user) return;
     setLoading(true);
     try {
-      const storedData = await AsyncStorage.getItem('@MedicalApp:appointments');
-      if (storedData) {
-        const allAppointments: Appointment[] = JSON.parse(storedData);
-        const userAppointments = allAppointments.filter(app => app.patientId === user.id);
-        setAppointments(userAppointments);
-      }
+      const [userAppointments, allUsers] = await Promise.all([
+        PatientDashboardService.loadAppointments(user.id),
+        PatientDashboardService.loadUsers()
+      ]);
+
+      const enriched = userAppointments.map(app => {
+          const doctor = allUsers.find(u => u.id === app.doctorId && u.role === 'doctor');
+          return {
+              ...app,
+              doctorName: doctor?.name || 'Médico não encontrado',
+              specialty: (doctor as any)?.specialty || ''
+          };
+      });
+
+      setAppointments(enriched);
     } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadAppointments();
-    }, [loadAppointments])
-  );
+  useFocusEffect(loadData);
 
   const handleNavigate = (screen: keyof RootStackParamList) => {
     navigation.navigate(screen);

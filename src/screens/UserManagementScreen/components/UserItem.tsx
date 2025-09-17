@@ -1,8 +1,11 @@
+// src/screens/UserManagementScreen/components/UserItem.tsx
 import React from 'react';
 import { ListItem, Button } from 'react-native-elements';
-import { User } from '../../../types/auth';
+import { User } from '../../../types';
 import { getRoleText } from '../hooks/useUserManagement';
-import * as S from '../styles';
+import {
+  UserCard, RoleBadge, RoleText, ButtonContainer, elementStyles,
+} from '../styles';
 
 type UserItemProps = {
   user: User;
@@ -12,36 +15,29 @@ type UserItemProps = {
 
 const UserItem: React.FC<UserItemProps> = ({ user, onEdit, onDelete }) => {
   return (
-    <S.UserCard>
+    <UserCard>
       <ListItem.Content>
-        <ListItem.Title style={S.elementStyles.userName}>
-          {user.name}
-        </ListItem.Title>
-        <ListItem.Subtitle style={S.elementStyles.userEmail}>
-          {user.email}
-        </ListItem.Subtitle>
-        <S.RoleBadge role={user.role}>
-          <S.RoleText role={user.role}>
-            {getRoleText(user.role)}
-          </S.RoleText>
-        </S.RoleBadge>
-
-        <S.ButtonContainer>
+        <ListItem.Title style={elementStyles.userName as TextStyle}>{user.name}</ListItem.Title>
+        <ListItem.Subtitle style={elementStyles.userEmail as TextStyle}>{user.email}</ListItem.Subtitle>
+        <RoleBadge role={user.role}>
+          <RoleText role={user.role}>{getRoleText(user.role)}</RoleText>
+        </RoleBadge>
+        <ButtonContainer>
           <Button
             title="Editar"
             onPress={() => onEdit(user.id)}
-            containerStyle={S.elementStyles.actionButtonContainer}
-            buttonStyle={S.elementStyles.editButton}
+            containerStyle={{ flex: 1, marginRight: 5 }}
+            buttonStyle={elementStyles.editButton}
           />
           <Button
             title="Excluir"
             onPress={() => onDelete(user.id)}
-            containerStyle={S.elementStyles.actionButtonContainer}
-            buttonStyle={S.elementStyles.deleteButton}
+            containerStyle={{ flex: 1, marginLeft: 5 }}
+            buttonStyle={elementStyles.deleteButton}
           />
-        </S.ButtonContainer>
+        </ButtonContainer>
       </ListItem.Content>
-    </S.UserCard>
+    </UserCard>
   );
 };
 

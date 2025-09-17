@@ -1,70 +1,71 @@
-import { useState } from 'react';
+// src/screens/CreateAppointmentScreen/hooks/useCreateAppointment.ts
+import { useState, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { Alert } from 'react-native';
 import { useAuth } from '../../../contexts/AuthContext';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../../types/navigation';
-import { createAppointmentService } from '../services/createAppointmentService';
+import { User } from '../../../types';
+import { CreateAppointmentService } from '../services/createAppointmentService';
 
-interface Doctor {
-  id: string;
-  name: string;
-  specialty: string;
-  image: string;
-}
-
-const availableDoctors: Doctor[] = [
-  { id: '1', name: 'Dr. João Silva', specialty: 'Cardiologia', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: '2', name: 'Dra. Maria Santos', specialty: 'Pediatria', image: 'https://randomuser.me/api/portraits/women/1.jpg' },
-  { id: '3', name: 'Dr. Pedro Oliveira', specialty: 'Ortopedia', image: 'https://randomuser.me/api/portraits/men/2.jpg' },
-  { id: '4', name: 'Dra. Ana Costa', specialty: 'Dermatologia', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { id: '5', name: 'Dr. Carlos Mendes', specialty: 'Oftalmologia', image: 'https://randomuser.me/api/portraits/men/3.jpg' },
-];
-
-type Navigation = NativeStackNavigationProp<RootStackParamList, 'CreateAppointment'>;
-
-export const useCreateAppointment = ({ navigation }: { navigation: Navigation }) => {
+export const useCreateAppointment = () => {
+  const navigation = useNavigation();
   const { user } = useAuth();
+
+  // Estado do formulário
   const [date, setDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState<string>('');
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
+
+  // Estado de dados e UI
+  const [doctors, setDoctors] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleCreateAppointment = async () => {
-    try {
+  // Carrega os médicos usando o serviço
+  useEffect(() => {
+    const fetchDoctors = async () => {
       setLoading(true);
-      setError('');
-
-      if (!date || !selectedTime || !selectedDoctor) {
-        setError('Por favor, preencha a data e selecione um médico e horário');
-        return;
+      try {
+        const doctorsData = await CreateAppointmentService.loadDoctors();
+        setDoctors(doctorsData);
+      } catch (err: any) {
+        setError(err.message || 'Erro ao carregar médicos.');
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchDoctors();
+  }, []);
 
-      await createAppointmentService({
-        user,
+  const handleSave = async () => {
+    if (!user || !date || !selectedTime || !selectedDoctorId) {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await CreateAppointmentService.addAppointment({
         date,
         time: selectedTime,
-        doctor: selectedDoctor,
-      });
+        doctorId: selectedDoctorId,
+        description: 'Consulta de rotina', // Ou adicionar um campo de descrição
+      }, user);
 
-      alert('Consulta agendada com sucesso!');
+      Alert.alert('Sucesso', 'Consulta agendada com sucesso!');
       navigation.goBack();
-    } catch {
-      setError('Erro ao agendar consulta. Tente novamente.');
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível agendar a consulta.');
     } finally {
       setLoading(false);
     }
   };
 
   return {
-    date,
-    setDate,
-    selectedTime,
-    setSelectedTime,
-    selectedDoctor,
-    setSelectedDoctor,
-    error,
+    date, setDate,
+    selectedTime, setSelectedTime,
+    selectedDoctorId, setSelectedDoctorId,
+    doctors,
     loading,
-    availableDoctors,
-    handleCreateAppointment,
+    error,
+    handleSave,
   };
 };

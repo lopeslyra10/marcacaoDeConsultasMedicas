@@ -1,11 +1,9 @@
 import React from 'react';
-import { Input, Button } from 'react-native-elements';
+import { Input, Button, Text } from 'react-native-elements';
 import { useLogin } from './hooks/useLogin';
-import { credentials } from './models/credentials';
-import * as S from './styles'; // Importa tudo de styles.ts como 'S'
+import { Container, Title, ErrorText, styles } from './styles';
 
 const LoginScreen: React.FC = () => {
-  // O hook provê todo o estado e a lógica necessários
   const {
     email,
     setEmail,
@@ -18,8 +16,8 @@ const LoginScreen: React.FC = () => {
   } = useLogin();
 
   return (
-    <S.Container>
-      <S.Title>Bem-vindo!</S.Title>
+    <Container>
+      <Title>App Marcação de Consultas</Title>
       
       <Input
         placeholder="Email"
@@ -27,7 +25,7 @@ const LoginScreen: React.FC = () => {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
-        containerStyle={S.elementStyles.inputContainer}
+        containerStyle={styles.input}
       />
 
       <Input
@@ -35,37 +33,34 @@ const LoginScreen: React.FC = () => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        containerStyle={S.elementStyles.inputContainer}
+        containerStyle={styles.input}
       />
 
-      {error ? <S.ErrorText>{error}</S.ErrorText> : null}
+      {error ? <ErrorText>{error}</ErrorText> : <ErrorText> </ErrorText>}
 
       <Button
         title="Entrar"
         onPress={handleLogin}
         loading={loading}
         disabled={loading}
-        containerStyle={S.elementStyles.buttonContainer}
-        buttonStyle={S.elementStyles.loginButton}
+        containerStyle={styles.button as ViewStyle}
+        buttonStyle={styles.buttonStyle}
       />
 
       <Button
-        title="Cadastrar Novo Paciente"
-        type="outline" // Fica melhor com o estilo que definimos
+        title="Cadastrar Novo Usuário"
+        type="clear"
         onPress={handleGoToRegister}
-        containerStyle={S.elementStyles.buttonContainer}
-        buttonStyle={S.elementStyles.registerButton}
-        titleStyle={S.elementStyles.registerButtonTitle}
+        disabled={loading}
+        containerStyle={styles.registerButton as ViewStyle}
+        buttonStyle={styles.registerButtonStyle}
+        titleStyle={styles.registerButtonTitle}
       />
-
-      <S.CredentialsContainer>
-        <S.HintText>{credentials.hint}</S.HintText>
-        <S.CredentialsText>
-          {credentials.admin}{'\n'}
-          {credentials.doctors}
-        </S.CredentialsText>
-      </S.CredentialsContainer>
-    </S.Container>
+      
+      <Text style={styles.hint}>
+        Primeiro acesso? Cadastre-se como Admin ou Paciente.
+      </Text>
+    </Container>
   );
 };
 

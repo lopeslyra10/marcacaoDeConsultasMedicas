@@ -1,7 +1,6 @@
 import styled from 'styled-components/native';
 import { ViewStyle } from 'react-native';
-import theme from '../../styles/theme'; 
-
+import theme from '../../styles/theme';
 
 export const Container = styled.View`
   flex: 1;
@@ -11,58 +10,46 @@ export const Container = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   text-align: center;
   margin-bottom: 30px;
-  color: ${theme.colors.primary};
+  color: ${theme.colors.text};
 `;
 
 export const ErrorText = styled.Text`
   color: ${theme.colors.error};
   text-align: center;
-  margin-bottom: 15px;
-  font-size: 14px;
+  margin-bottom: 10px;
+  min-height: 18px;
 `;
 
-export const CredentialsContainer = styled.View`
-  margin-top: 25px;
-  padding: 15px;
-  background-color: #f7f7f7;
-  border-radius: 8px;
-`;
-
-export const HintText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  font-weight: bold;
-`;
-
-export const CredentialsText = styled.Text`
-  margin-top: 8px;
-  text-align: center;
-  color: ${theme.colors.text};
-  font-size: 12px;
-  line-height: 18px;
-`;
-
-export const elementStyles = {
-  inputContainer: {
+export const styles = {
+  input: {
     marginBottom: 15,
-  } as ViewStyle,
-  buttonContainer: {
+  },
+  button: {
     marginTop: 10,
     width: '100%',
-  } as ViewStyle,
-  loginButton: {
+  },
+  buttonStyle: {
     backgroundColor: theme.colors.primary,
     paddingVertical: 12,
   },
   registerButton: {
+    marginTop: 10,
+    width: '100%',
+  },
+  registerButtonStyle: {
     backgroundColor: 'transparent',
-    paddingVertical: 12,
   },
   registerButtonTitle: {
     color: theme.colors.primary,
-  }
+  },
+  hint: {
+    marginTop: 20,
+    textAlign: 'center' as const,
+    color: theme.colors.text,
+    fontSize: 12,
+  },
 };

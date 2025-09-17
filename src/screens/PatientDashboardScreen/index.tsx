@@ -1,67 +1,62 @@
+// src/screens/PatientDashboardScreen/index.tsx
 import React from 'react';
 import { FlatList } from 'react-native';
 import { Button } from 'react-native-elements';
 import { usePatientDashboard } from './hooks/usePatientDashboard';
 import Header from '../../components/Header';
-import AppointmentItem from './components/AppointmentItem';
-import * as S from './styles';
+import AppointmentCard from './components/AppointmentCard';
+import { Container, Title, LoadingText, EmptyText, styles } from './styles';
 
 const PatientDashboardScreen: React.FC = () => {
   const { loading, appointments, signOut, handleNavigate } = usePatientDashboard();
 
-  const renderListHeader = () => (
+  const ListHeader = () => (
     <>
-      <S.Title>Minhas Consultas</S.Title>
+      <Title>Minhas Consultas</Title>
       <Button
         title="Agendar Nova Consulta"
         onPress={() => handleNavigate('CreateAppointment')}
-        containerStyle={S.elementStyles.buttonContainer}
-        buttonStyle={S.elementStyles.primaryButton}
+        containerStyle={styles.button as ViewStyle}
+        buttonStyle={styles.buttonStyle}
       />
       <Button
         title="Meu Perfil"
         onPress={() => handleNavigate('Profile')}
-        containerStyle={S.elementStyles.buttonContainer}
-        buttonStyle={S.elementStyles.secondaryButton}
-      />
-      <Button
-        title="Configurações"
-        onPress={() => handleNavigate('Settings')}
-        containerStyle={S.elementStyles.buttonContainer}
-        buttonStyle={S.elementStyles.secondaryButton}
+        containerStyle={styles.button as ViewStyle}
+        buttonStyle={styles.buttonStyle}
       />
     </>
   );
 
   if (loading) {
     return (
-      <S.Container>
+      <Container>
         <Header />
-        <S.LoadingText>Carregando...</S.LoadingText>
-      </S.Container>
+        <LoadingText>Carregando consultas...</LoadingText>
+      </Container>
     );
   }
 
   return (
-    <S.Container>
+    <Container>
       <Header />
       <FlatList
         data={appointments}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <AppointmentItem appointment={item} />}
-        ListHeaderComponent={renderListHeader}
+        renderItem={({ item }) => <AppointmentCard appointment={item} />}
+        ListHeaderComponent={ListHeader}
         ListFooterComponent={
           <Button
             title="Sair"
             onPress={signOut}
-            containerStyle={S.elementStyles.buttonContainer}
-            buttonStyle={S.elementStyles.logoutButton}
+            containerStyle={styles.button as ViewStyle}
+            buttonStyle={styles.logoutButton}
           />
         }
-        ListEmptyComponent={<S.EmptyText>Nenhuma consulta agendada</S.EmptyText>}
-        contentContainerStyle={{ padding: 20 }}
+        ListEmptyComponent={<EmptyText>Nenhuma consulta agendada</EmptyText>}
+        contentContainerStyle={styles.scrollContent}
       />
-    </S.Container>
+    </Container>
   );
 };
 

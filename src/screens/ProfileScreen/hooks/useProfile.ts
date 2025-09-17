@@ -1,13 +1,19 @@
+// src/screens/ProfileScreen/hooks/useProfile.ts
+
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../../../contexts/AuthContext'; 
-import { RootStackParamList } from '../../../types/navigation'; 
+import { useAuth } from '../../../contexts/AuthContext';
+import { RootStackParamList, User } from '../../../types';
 
 export const useProfile = () => {
   const { user, signOut } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const getRoleText = (role: string | undefined) => {
+  /**
+   * Formata o texto do perfil do usuário para exibição.
+   */
+  const getRoleText = (role: User['role'] | undefined): string => {
+    if (!role) return 'Indefinido';
     switch (role) {
       case 'admin':
         return 'Administrador';
@@ -16,14 +22,20 @@ export const useProfile = () => {
       case 'patient':
         return 'Paciente';
       default:
-        return 'N/A';
+        return role;
     }
   };
 
+  /**
+   * Navega para a tela de edição de perfil.
+   */
   const handleEditProfile = () => {
     navigation.navigate('EditProfile');
   };
 
+  /**
+   * Navega de volta para a tela anterior.
+   */
   const handleGoBack = () => {
     navigation.goBack();
   };

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Alert } from 'react-native';
+import { useState, useCallback } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '../../../contexts/AuthContext'; 
-import { User } from '../../../types/auth'; 
-import theme from '../../../styles/theme'; 
+import { Alert } from 'react-native';
+import { useAuth } from '../../../contexts/AuthContext';
+import { User } from '../../../types';
+import { UserManagementService } from '../services/userManagementService';
+import theme from '../../../styles/theme';
 
-// --- FUNÇÃO HELPER ---
+// Funções helper para a UI
 export const getRoleText = (role: User['role']) => {
   switch (role) {
     case 'admin': return 'Administrador';
@@ -24,58 +24,53 @@ export const getRoleColor = (role: User['role']) => {
   }
 };
 
-// --- HOOK PRINCIPAL ---
+
 export const useUserManagement = () => {
   const { user: currentUser } = useAuth();
   const navigation = useNavigation();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadUsers = React.useCallback(async () => {
+  const fetchUsers = useCallback(async () => {
+    if (!currentUser) return;
     setLoading(true);
     try {
-      const storedData = await AsyncStorage.getItem('@MedicalApp:users');
-      if (storedData) {
-        const allUsers: User[] = JSON.parse(storedData);
-        // Filtra o usuário atual da lista para não se auto-gerenciar
-        setUsers(allUsers.filter(u => u.id !== currentUser?.id));
-      }
+      const loadedUsers = await UserManagementService.loadUsers(currentUser.id);
+      setUsers(loadedUsers);
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível carregar a lista de usuários.');
     } finally {
       setLoading(false);
     }
-  }, [currentUser?.id]);
+  }, [currentUser]);
 
-  useFocusEffect(loadUsers);
+  useFocusEffect(fetchUsers);
 
   const handleDeleteUser = (userId: string) => {
-    Alert.alert('Excluir Usuário', 'Tem certeza que deseja excluir este usuário?', [
+    Alert.alert('Excluir Usuário', 'Tem certeza que deseja excluir este usuário permanentemente?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Excluir',
         style: 'destructive',
         onPress: async () => {
           try {
-            const updatedUsers = users.filter(u => u.id !== userId);
-            // Adiciona o usuário atual de volta antes de salvar para não se excluir
-            const usersToSave = currentUser ? [...updatedUsers, currentUser] : updatedUsers;
-            await AsyncStorage.setItem('@MedicalApp:users', JSON.stringify(usersToSave));
-            setUsers(updatedUsers); // Atualiza o estado local sem precisar reler do AsyncStorage
+            // Chama o serviço para deletar e já recebe a lista atualizada
+            const allUsersUpdated = await UserManagementService.deleteUser(userId);
+            // Filtra o usuário logado novamente para a exibição na tela
+            setUsers(allUsersUpdated.filter(u => u.id !== currentUser?.id));
+            Alert.alert('Sucesso', 'Usuário excluído.');
           } catch (error) {
-            console.error('Erro ao deletar usuário:', error);
             Alert.alert('Erro', 'Não foi possível excluir o usuário.');
           }
         },
       },
     ]);
   };
-  
+
   const handleGoBack = () => navigation.goBack();
-  
-  // Funções placeholder para futuras implementações
-  const handleAddNewUser = () => Alert.alert('A Fazer', 'A tela de criação de usuário ainda não foi implementada.');
-  const handleEditUser = (userId: string) => Alert.alert('A Fazer', `A edição para o usuário ${userId} ainda não foi implementada.`);
+  const handleAddNewUser = () => Alert.alert('A Fazer', 'Funcionalidade não implementada.');
+  const handleEditUser = (userId: string) => Alert.alert('A Fazer', `Edição para o usuário ${userId} não implementada.`);
 
   return {
     loading,

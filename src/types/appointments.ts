@@ -2,6 +2,7 @@
  * Tipos relacionados a consultas médicas
  * Este arquivo contém todas as definições de tipos necessárias para o gerenciamento de consultas
  */
+
 /**
  * Representa uma consulta médica no sistema
  * @property id - Identificador único da consulta
@@ -11,19 +12,11 @@
  * @property description - Descrição ou motivo da consulta
  * @property status - Status atual da consulta (agendada, realizada, cancelada)
  */
-// src/types/appointments.ts
-
-export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
-
 export type Appointment = {
   id: string;
-  patientId: string;
-  patientName: string;
   doctorId: string;
-  doctorName: string;
   date: string;
-  time: string;    
-  description?: string;
-  specialty: string;
-  status: AppointmentStatus;
-};
+  time: string;
+  description: string;
+  status: string;
+}; 
