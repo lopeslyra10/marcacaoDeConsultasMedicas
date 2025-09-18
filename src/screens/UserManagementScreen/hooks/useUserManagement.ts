@@ -1,83 +1,74 @@
-import { useState, useCallback } from 'react';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { Alert } from 'react-native';
-import { useAuth } from '../../../contexts/AuthContext';
-import { User } from '../../../types';
-import { UserManagementService } from '../services/userManagementService';
-import theme from '../../../styles/theme';
-
-// Funções helper para a UI
-export const getRoleText = (role: User['role']) => {
-  switch (role) {
-    case 'admin': return 'Administrador';
-    case 'doctor': return 'Médico';
-    case 'patient': return 'Paciente';
-    default: return role;
-  }
-};
-
-export const getRoleColor = (role: User['role']) => {
-  switch (role) {
-    case 'admin': return theme.colors.primary;
-    case 'doctor': return theme.colors.success;
-    default: return theme.colors.secondary;
-  }
-};
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { User } from "../models/user";
+import { UserManagementScreenProps } from "../types/type";
+import { useAuth } from "../../../contexts/AuthContext";
+import { UserManagementService } from "../services/userManagementService";
 
 export const useUserManagement = () => {
-  const { user: currentUser } = useAuth();
-  const navigation = useNavigation();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
+    const navigation = useNavigation<UserManagementScreenProps['navigation']>();
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  const fetchUsers = useCallback(async () => {
-    if (!currentUser) return;
-    setLoading(true);
-    try {
-      const loadedUsers = await UserManagementService.loadUsers(currentUser.id);
-      setUsers(loadedUsers);
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', 'Não foi possível carregar a lista de usuários.');
-    } finally {
-      setLoading(false);
+    const loadUsers = async () => {
+        try {
+            const storedUsers = await UserManagementService.handleStoredUsers();
+            if (storedUsers) {
+                const allUsers: User[] = storedUsers;
+                // Filtra o usuário atual da lista
+                console.log("Usuarios carregados")
+                const filteredUsers = allUsers.filter(u => u.id !== user?.id);
+                setUsers(filteredUsers);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar usuários:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteUser = async (userId: string) => {
+        try {
+            const storedUsers = await UserManagementService.handleStoredUsers();
+            if (storedUsers) {
+                const allUsers: User[] = storedUsers;
+                const updatedUsers = allUsers.filter(u => u.id !== userId);
+                await UserManagementService.handleUpdatedUsers(updatedUsers);
+                loadUsers(); // Recarrega a lista
+            }
+        } catch (error) {
+            console.error('Erro ao deletar usuário:', error);
+        }
+    };
+
+    // Carrega os usuários quando a tela estiver em foco
+    useFocusEffect(
+        React.useCallback(() => {
+            loadUsers();
+        }, [])
+    );
+
+    const getRoleText = (role: string) => {
+        switch (role) {
+            case 'admin':
+                return 'Administrador';
+            case 'doctor':
+                return 'Médico';
+            case 'patient':
+                return 'Paciente';
+            default:
+                return role;
+        }
+    };
+
+    return {
+        user,
+        navigation,
+        users,
+        loading,
+        handleDeleteUser,
+        getRoleText
     }
-  }, [currentUser]);
-
-  useFocusEffect(fetchUsers);
-
-  const handleDeleteUser = (userId: string) => {
-    Alert.alert('Excluir Usuário', 'Tem certeza que deseja excluir este usuário permanentemente?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            // Chama o serviço para deletar e já recebe a lista atualizada
-            const allUsersUpdated = await UserManagementService.deleteUser(userId);
-            // Filtra o usuário logado novamente para a exibição na tela
-            setUsers(allUsersUpdated.filter(u => u.id !== currentUser?.id));
-            Alert.alert('Sucesso', 'Usuário excluído.');
-          } catch (error) {
-            Alert.alert('Erro', 'Não foi possível excluir o usuário.');
-          }
-        },
-      },
-    ]);
-  };
-
-  const handleGoBack = () => navigation.goBack();
-  const handleAddNewUser = () => Alert.alert('A Fazer', 'Funcionalidade não implementada.');
-  const handleEditUser = (userId: string) => Alert.alert('A Fazer', `Edição para o usuário ${userId} não implementada.`);
-
-  return {
-    loading,
-    users,
-    handleDeleteUser,
-    handleAddNewUser,
-    handleEditUser,
-    handleGoBack,
-  };
-};
+}

@@ -13,11 +13,8 @@ export class AppointmentService {
     userName: string
   ): Promise<Appointment> {
     try {
-      // Recupera consultas existentes
       const storedAppointments = await AsyncStorage.getItem(this.APPOINTMENTS_KEY);
       const appointments: Appointment[] = storedAppointments ? JSON.parse(storedAppointments) : [];
-
-      // Cria nova consulta
       const newAppointment: Appointment = {
         id: Date.now().toString(),
         patientId: userId,
@@ -29,14 +26,10 @@ export class AppointmentService {
         specialty: selectedDoctor.specialty,
         status: 'pending',
       };
-
-      // Adiciona nova consulta à lista
       appointments.push(newAppointment);
 
-      // Salva lista atualizada
       await AsyncStorage.setItem(this.APPOINTMENTS_KEY, JSON.stringify(appointments));
 
-      // Envia notificação para o médico
       await notificationService.notifyNewAppointment(selectedDoctor.id, newAppointment);
 
       return newAppointment;

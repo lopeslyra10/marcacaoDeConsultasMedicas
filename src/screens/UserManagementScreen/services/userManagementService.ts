@@ -1,41 +1,26 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User } from '../../../types';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { User } from "../models/user";
 
 export class UserManagementService {
-  private static readonly USERS_KEY = '@MedicalApp:users';
-
-  /**
-   * Carrega todos os usuários do AsyncStorage, exceto o usuário logado.
-   */
-  static async loadUsers(currentUserId: string): Promise<User[]> {
-    try {
-      const stored = await AsyncStorage.getItem(this.USERS_KEY);
-      if (!stored) return [];
-
-      const allUsers: User[] = JSON.parse(stored);
-      return allUsers.filter(u => u.id !== currentUserId);
-    } catch (error) {
-      console.error('Erro ao carregar usuários no serviço:', error);
-      throw new Error('Não foi possível buscar os usuários.');
+    static async handleStoredUsers(): Promise<User[]> {
+        try {
+            const storedUsers = await AsyncStorage.getItem('@MedicalApp:users');
+            if(storedUsers) {
+                return JSON.parse(storedUsers)
+            }
+            return [];
+        } catch (e) {
+            console.error("Erro ao carregar usuários:", e)
+            return [];
+        }
     }
-  }
-
-  /**
-   * Deleta um usuário da lista e salva a lista atualizada no AsyncStorage.
-   */
-  static async deleteUser(userIdToDelete: string): Promise<User[]> {
-    try {
-      const stored = await AsyncStorage.getItem(this.USERS_KEY);
-      if (!stored) return [];
-
-      const allUsers: User[] = JSON.parse(stored);
-      const updatedUsers = allUsers.filter(u => u.id !== userIdToDelete);
-      
-      await AsyncStorage.setItem(this.USERS_KEY, JSON.stringify(updatedUsers));
-      return updatedUsers; // Retorna a lista completa atualizada
-    } catch (error) {
-      console.error('Erro ao deletar usuário no serviço:', error);
-      throw new Error('Não foi possível excluir o usuário.');
+    
+    static async handleUpdatedUsers(updatedUsers: User[]): Promise<void> {
+        try {
+            await AsyncStorage.setItem('@MedicalApp:users', JSON.stringify(updatedUsers));
+            console.log("Update de usuário realizada com sucesso!");
+        } catch (e) {
+            console.log("Não foi possível realizar a atualização dos usuários:", e)
+        }
     }
-  }
 }

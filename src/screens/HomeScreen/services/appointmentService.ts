@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Appointment } from '../../../types/appointments';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Appointment } from "../../../types";
 
 export class HomeAppointmentService {
   private static readonly STORAGE_KEY = 'appointments';
@@ -38,5 +38,3 @@ export class HomeAppointmentService {
     }
   }
 }
-
-export default HomeAppointmentService;

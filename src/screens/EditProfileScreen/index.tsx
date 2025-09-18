@@ -1,95 +1,63 @@
 import React from 'react';
-import { Button, Input } from 'react-native-elements';
-import { useEditProfile } from './hooks/useEditProfile';
+import { ScrollView, ViewStyle } from 'react-native';
+import { Button } from 'react-native-elements';
+import { Container, styles, Title } from './styles';
 import Header from '../../components/Header';
-import ProfileImagePicker from '../../components/ProfileImagePicker'; 
-import * as S from './styles';
+import { useEditProfile } from './hook/useEditProfile';
+import { ProfileSection } from './components/ProfileSection';
+
 
 const EditProfileScreen: React.FC = () => {
-  const {
-    user,
-    name,
-    setName,
-    email,
-    setEmail,
-    specialty,
-    setSpecialty,
-    profileImage,
-    loading,
-    handleImageSelected,
-    handleSaveProfile,
-    handleCancel,
-  } = useEditProfile();
+    const {
+        name,
+        setName,
+        email,
+        setEmail,
+        specialty,
+        setSpecialty,
+        profileImage,
+        loading,
+        handleImageSelected,
+        handleSaveProfile,
+        user,
+        navigation,
+    } = useEditProfile();
 
-  const userRole = user?.role || '';
+    return (
+        <Container>
+            <Header />
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <Title>Editar Perfil</Title>
 
-  return (
-    <S.Container>
-      <Header />
-      <S.ScrollContainer>
-        <S.Title>Editar Perfil</S.Title>
+                <ProfileSection
+                    profileImage={profileImage}
+                    handleImageSelected={handleImageSelected}
+                    name={name}
+                    setName={setName}
+                    email={email}
+                    setEmail={setEmail}
+                    specialty={specialty}
+                    setSpecialty={setSpecialty}
+                    user={user}
+                />
 
-        <S.ProfileCard>
-          <ProfileImagePicker
-            currentImageUri={profileImage}
-            onImageSelected={handleImageSelected}
-            size={120}
-          />
+                <Button
+                    title="Salvar Alterações"
+                    onPress={handleSaveProfile}
+                    loading={loading}
+                    containerStyle={styles.button as ViewStyle}
+                    buttonStyle={styles.saveButton}
+                />
 
-          <Input
-            label="Nome"
-            value={name}
-            onChangeText={setName}
-            containerStyle={S.elementStyles.input}
-            placeholder="Digite seu nome"
-          />
-
-          <Input
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            containerStyle={S.elementStyles.input}
-            placeholder="Digite seu email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          {userRole === 'doctor' && (
-            <Input
-              label="Especialidade"
-              value={specialty}
-              onChangeText={setSpecialty}
-              containerStyle={S.elementStyles.input}
-              placeholder="Digite sua especialidade"
-            />
-          )}
-
-          <S.RoleBadge role={userRole}>
-            <S.RoleText>
-              {userRole === 'admin' ? 'Administrador' : userRole === 'doctor' ? 'Médico' : 'Paciente'}
-            </S.RoleText>
-          </S.RoleBadge>
-        </S.ProfileCard>
-
-        <Button
-          title="Salvar Alterações"
-          onPress={handleSaveProfile}
-          loading={loading}
-          disabled={loading}
-          containerStyle={S.elementStyles.buttonContainer}
-          buttonStyle={S.elementStyles.saveButton}
-        />
-
-        <Button
-          title="Cancelar"
-          onPress={handleCancel}
-          disabled={loading}
-          containerStyle={S.elementStyles.buttonContainer}
-          buttonStyle={S.elementStyles.cancelButton}
-        />
-      </S.ScrollContainer>
-    </S.Container>
-  );
+                <Button
+                    title="Cancelar"
+                    onPress={() => navigation.goBack()}
+                    containerStyle={styles.button as ViewStyle}
+                    buttonStyle={styles.cancelButton}
+                />
+            </ScrollView>
+        </Container>
+    );
 };
 
 export default EditProfileScreen;

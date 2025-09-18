@@ -1,4 +1,4 @@
-import { Doctor } from '../../../types/doctors';
+import { Doctor } from "../../../types";
 
 export const mockDoctors: Doctor[] = [
   {
@@ -21,8 +21,6 @@ export const mockDoctors: Doctor[] = [
   },
 ];
 
-export const getDoctorInfo = (doctorId: string): Doctor | undefined => {
-  return mockDoctors.find(doctor => doctor.id === doctorId);
-};
-
-export default mockDoctors;
+export const getDoctorInfo = (doctorId: string) : Doctor | undefined => {
+  return mockDoctors.find(doctor => doctorId === doctor.id)
+}

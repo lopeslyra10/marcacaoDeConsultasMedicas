@@ -10,6 +10,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { availableDoctors } from './models/availableDoctors';
 import { useCreateAppointment } from './hooks/useCreateAppointment';
 import { AppointmentService } from './services/appointmentService';
+import { CreateAppointmentActions } from './components/CreateAppointmentActions';
+import { AppointmentInputs } from './components/AppointmentInputs';
 
 const CreateAppointmentScreen: React.FC = () => {
   const {

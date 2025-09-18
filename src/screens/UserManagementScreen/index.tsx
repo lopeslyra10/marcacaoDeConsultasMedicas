@@ -1,62 +1,41 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { ScrollView, ViewStyle } from 'react-native';
 import { Button } from 'react-native-elements';
-import { useUserManagement } from './hooks/useUserManagement';
+import { Container, styles, Title } from './styles';
 import Header from '../../components/Header';
-import UserItem from './components/UserItem';
-import { Container, Title, LoadingText, EmptyText, elementStyles } from './styles';
+import { useUserManagement } from './hooks/useUserManagement';
+import { UsersList } from './components/UserList';
+
 
 const UserManagementScreen: React.FC = () => {
-  const {
-    loading, users, handleDeleteUser, handleAddNewUser, handleEditUser, handleGoBack,
-  } = useUserManagement();
+    const {
+        navigation,
+    } = useUserManagement();
 
-  if (loading) {
     return (
-      <Container>
-        <Header />
-        <LoadingText>Carregando usuários...</LoadingText>
-      </Container>
-    );
-  }
+        <Container>
+            <Header />
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <Title>Gerenciar Usuários</Title>
 
-  return (
-    <Container>
-      <Header />
-      <FlatList
-        data={users}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <UserItem
-            user={item}
-            onEdit={handleEditUser}
-            onDelete={handleDeleteUser}
-          />
-        )}
-        ListHeaderComponent={
-          <>
-            <Title>Gerenciar Usuários</Title>
-            <Button
-              title="Adicionar Novo Usuário"
-              onPress={handleAddNewUser}
-              containerStyle={elementStyles.button as ViewStyle}
-              buttonStyle={elementStyles.buttonStyle}
-            />
-          </>
-        }
-        ListFooterComponent={
-          <Button
-            title="Voltar"
-            onPress={handleGoBack}
-            containerStyle={elementStyles.button as ViewStyle}
-            buttonStyle={elementStyles.backButton}
-          />
-        }
-        ListEmptyComponent={<EmptyText>Nenhum outro usuário cadastrado</EmptyText>}
-        contentContainerStyle={{ padding: 20 }}
-      />
-    </Container>
-  );
+                <Button
+                    title="Adicionar Novo Usuário"
+                    onPress={() => { }}
+                    containerStyle={styles.button as ViewStyle}
+                    buttonStyle={styles.buttonStyle}
+                />
+
+                <UsersList />
+
+                <Button
+                    title="Voltar"
+                    onPress={() => navigation.goBack()}
+                    containerStyle={styles.button as ViewStyle}
+                    buttonStyle={styles.backButton}
+                />
+            </ScrollView>
+        </Container>
+    );
 };
 
-export default UserManagementScreen;
+export default UserManagementScreen; 

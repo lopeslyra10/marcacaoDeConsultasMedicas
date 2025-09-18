@@ -1,77 +1,56 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { Button } from 'react-native-elements';
-import { useProfile } from './hooks/useProfile';
+import { Button, ListItem } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ScrollView, ViewStyle } from 'react-native';
+import { Container, Email, Name, ProfileCard, RoleBadge, RoleText, SpecialtyText, styles, Title } from './styles';
 import Header from '../../components/Header';
-import {
-  Container, ScrollView, Title, ProfileCard, Avatar,
-  Name, Email, RoleBadge, RoleText, SpecialtyText, elementStyles,
-} from './styles';
+import ProfileImagePicker from '../../components/ProfileImagePicker';
+import { useProfile } from './hooks/useProfile';
+import { ProfileSection } from './components/ProfileSection';
 
 const ProfileScreen: React.FC = () => {
-  const {
-    user,
-    signOut,
-    getRoleText,
-    handleEditProfile,
-    handleGoBack,
-  } = useProfile();
+    const {
+        user,
+        signOut,
+        navigation,
+        getRoleText,
+    } = useProfile();
 
-  if (!user) {
-    // Estado de fallback caso o usuário ainda não tenha sido carregado
     return (
-      <Container>
-        <Header />
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <ActivityIndicator size="large" />
-        </View>
-      </Container>
+        <Container>
+            <Header />
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <Title>Meu Perfil</Title>
+
+                <ProfileSection
+                    user={user}
+                    getRoleText={getRoleText}
+                />
+
+                <Button
+                    title="Editar Perfil"
+                    onPress={() => navigation.navigate('EditProfile' as any)}
+                    containerStyle={styles.button as ViewStyle}
+                    buttonStyle={styles.editButton}
+                />
+
+                <Button
+                    title="Voltar"
+                    onPress={() => navigation.goBack()}
+                    containerStyle={styles.button as ViewStyle}
+                    buttonStyle={styles.buttonStyle}
+                />
+
+                <Button
+                    title="Sair"
+                    onPress={signOut}
+                    containerStyle={styles.button as ViewStyle}
+                    buttonStyle={styles.logoutButton}
+                />
+            </ScrollView>
+        </Container>
     );
-  }
-
-  return (
-    <Container>
-      <Header />
-      <ScrollView>
-        <Title>Meu Perfil</Title>
-
-        <ProfileCard>
-          <Avatar source={{ uri: user.image || 'https://via.placeholder.com/150' }} />
-          <Name>{user.name}</Name>
-          <Email>{user.email}</Email>
-          
-          <RoleBadge role={user.role}>
-            <RoleText>{getRoleText(user.role)}</RoleText>
-          </RoleBadge>
-          
-          {user.role === 'doctor' && 'specialty' in user && (
-            <SpecialtyText>Especialidade: {user.specialty}</SpecialtyText>
-          )}
-        </ProfileCard>
-
-        <Button
-          title="Editar Perfil"
-          onPress={handleEditProfile}
-          containerStyle={elementStyles.buttonContainer}
-          buttonStyle={elementStyles.editButton}
-        />
-
-        <Button
-          title="Voltar"
-          onPress={handleGoBack}
-          containerStyle={elementStyles.buttonContainer}
-          buttonStyle={elementStyles.backButton}
-        />
-
-        <Button
-          title="Sair"
-          onPress={signOut}
-          containerStyle={elementStyles.buttonContainer}
-          buttonStyle={elementStyles.logoutButton}
-        />
-      </ScrollView>
-    </Container>
-  );
 };
 
 export default ProfileScreen;

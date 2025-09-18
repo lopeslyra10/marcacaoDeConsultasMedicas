@@ -1,86 +1,66 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { ScrollView, ViewStyle, } from 'react-native';
 import { Button, Badge } from 'react-native-elements';
+import { Container, styles, Title, TitleContainer } from './styles';
+import Header from '../../components/Header';
 import { useNotifications } from './hooks/useNotifications';
-import Header from '../../components/Header'; // Ajuste o caminho
-import NotificationItem from './components/NotificationItem';
-import * as S from './styles';
+import { NotificationList } from './components/NotificationList';
 
 const NotificationsScreen: React.FC = () => {
   const {
     loading,
     notifications,
-    unreadCount,
     handleMarkAsRead,
-    handleMarkAllAsRead,
     handleDeleteNotification,
-    handleGoBack,
+    getNotificationIcon,
+    formatDate,
+    navigation,
+    handleMarkAllAsRead,
+    unreadCount
   } = useNotifications();
 
-  const renderHeader = () => (
-    <>
-      <S.TitleContainer>
-        <S.Title>Notificações</S.Title>
-        {unreadCount > 0 && (
-          <Badge
-            value={unreadCount}
-            status="error"
-            containerStyle={S.elementStyles.badge}
-          />
-        )}
-      </S.TitleContainer>
-
-      {unreadCount > 0 && (
-        <Button
-          title="Marcar todas como lidas"
-          onPress={handleMarkAllAsRead}
-          containerStyle={S.elementStyles.markAllButtonContainer}
-          buttonStyle={S.elementStyles.markAllButton}
-        />
-      )}
-
-      <Button
-        title="Voltar"
-        type="outline"
-        onPress={handleGoBack}
-        containerStyle={S.elementStyles.backButtonContainer}
-        buttonStyle={S.elementStyles.backButton}
-        titleStyle={S.elementStyles.backButtonTitle}
-      />
-    </>
-  );
-
-  if (loading) {
-    return (
-      <S.Container>
-        <Header />
-        <S.LoadingText>Carregando notificações...</S.LoadingText>
-      </S.Container>
-    );
-  }
-
   return (
-    <S.Container>
+    <Container>
       <Header />
-      <FlatList
-        data={notifications}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <NotificationItem
-            notification={item}
-            onMarkAsRead={handleMarkAsRead}
-            onDelete={handleDeleteNotification}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <TitleContainer>
+          <Title>Notificações</Title>
+          {unreadCount > 0 && (
+            <Badge
+              value={unreadCount}
+              status="error"
+              containerStyle={styles.badge}
+            />
+          )}
+        </TitleContainer>
+
+        {unreadCount > 0 && (
+          <Button
+            title="Marcar todas como lidas"
+            onPress={handleMarkAllAsRead}
+            containerStyle={styles.markAllButton as ViewStyle}
+            buttonStyle={styles.markAllButtonStyle}
           />
         )}
-        ListHeaderComponent={renderHeader}
-        ListEmptyComponent={
-          <S.EmptyContainer>
-            <S.EmptyText>Nenhuma notificação encontrada</S.EmptyText>
-          </S.EmptyContainer>
-        }
-        contentContainerStyle={{ padding: 20 }}
-      />
-    </S.Container>
+
+        <Button
+          title="Voltar"
+          onPress={() => navigation.goBack()}
+          containerStyle={styles.button as ViewStyle}
+          buttonStyle={styles.buttonStyle}
+        />
+
+        <NotificationList
+          loading={loading}
+          notifications={notifications}
+          handleMarkAsRead={handleMarkAsRead}
+          handleDeleteNotification={handleDeleteNotification}
+          getNotificationIcon={getNotificationIcon}
+          formatDate={formatDate}
+        />
+
+      </ScrollView>
+    </Container>
   );
 };
 
