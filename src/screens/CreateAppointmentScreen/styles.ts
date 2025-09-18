@@ -1,5 +1,26 @@
-import styled from 'styled-components/native';
-import theme from '../../styles/theme';
+import styled from "styled-components/native";
+import theme from "../../styles/theme";
+
+export const styles = {
+  scrollContent: {
+    padding: 20,
+  },
+  input: {
+    marginBottom: 15,
+  },
+  button: {
+    marginTop: 10,
+    width: '100%',
+  },
+  buttonStyle: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
+  },
+  cancelButton: {
+    backgroundColor: theme.colors.secondary,
+    paddingVertical: 12,
+  },
+};
 
 export const Container = styled.View`
   flex: 1;
@@ -27,11 +48,3 @@ export const ErrorText = styled.Text`
   text-align: center;
   margin-bottom: 10px;
 `;
-
-export const styles = {
-  scrollContent: { padding: 20 },
-  input: { marginBottom: 15 },
-  button: { marginTop: 10, width: '100%' },
-  buttonStyle: { backgroundColor: theme.colors.primary, paddingVertical: 12 },
-  cancelButton: { backgroundColor: theme.colors.secondary, paddingVertical: 12 },
-};

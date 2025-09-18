@@ -1,28 +1,29 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, ViewStyle } from 'react-native';
 import { Button, Input } from 'react-native-elements';
-import { useCreateAppointment } from './hooks/useCreateAppointment';
-import { convertUsersToDoctors } from './models/doctorModel';
-import { Container, Title, SectionTitle, ErrorText, styles } from './styles';
+import { Container, ErrorText, SectionTitle, styles, Title } from './styles';
 import Header from '../../components/Header';
-import DoctorList from '../../components/DoctorList';
 import TimeSlotList from '../../components/TimeSlotList';
+import DoctorList from '../../components/DoctorList';
+import { useAuth } from '../../contexts/AuthContext';
+import { availableDoctors } from './models/availableDoctors';
+import { useCreateAppointment } from './hooks/useCreateAppointment';
+import { AppointmentService } from './services/appointmentService';
 
 const CreateAppointmentScreen: React.FC = () => {
   const {
-    date, setDate,
-    selectedTime, setSelectedTime,
-    selectedDoctorId, setSelectedDoctorId,
-    doctors,
+    navigation,
+    date,
+    selectedTime,
+    selectedDoctor,
     loading,
     error,
-    handleSave,
+    updateDate,
+    updateSelectedTime,
+    updateSelectedDoctor,
+    handleCreateAppointment,
   } = useCreateAppointment();
-
-  const navigation = useNavigation();
-
-  // Converte os dados para o formato que o DoctorList espera
-  const doctorListData = convertUsersToDoctors(doctors);
 
   return (
     <Container>
@@ -30,46 +31,21 @@ const CreateAppointmentScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Title>Agendar Consulta</Title>
 
-        <Input
-          placeholder="Data (DD/MM/AAAA)"
-          value={date}
-          onChangeText={setDate}
-          containerStyle={styles.input}
-          keyboardType="numeric"
-        />
-
-        <SectionTitle>Selecione um Horário</SectionTitle>
-        <TimeSlotList
-          onSelectTime={setSelectedTime}
+        <AppointmentInputs
+          date={date}
+          updateDate={updateDate}
+          updateSelectedTime={updateSelectedTime}
           selectedTime={selectedTime}
+          updateSelectedDoctor={updateSelectedDoctor}
+          selectedDoctor={selectedDoctor}
         />
 
-        <SectionTitle>Selecione um Médico</SectionTitle>
-        {loading && doctors.length === 0 ? (
-          <ErrorText>Carregando médicos...</ErrorText>
-        ) : (
-          <DoctorList
-            doctors={doctorListData}
-            onSelectDoctor={(doctor) => setSelectedDoctorId(doctor.id)}
-            selectedDoctorId={selectedDoctorId}
-          />
-        )}
-        
         {error ? <ErrorText>{error}</ErrorText> : null}
 
-        <Button
-          title="Agendar"
-          onPress={handleSave}
+        <CreateAppointmentActions
           loading={loading}
-          containerStyle={styles.button as any}
-          buttonStyle={styles.buttonStyle}
-        />
-
-        <Button
-          title="Cancelar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button as any}
-          buttonStyle={styles.cancelButton}
+          handleCreateAppointment={handleCreateAppointment}
+          navigation={navigation}
         />
       </ScrollView>
     </Container>
